@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/song_model.dart';
 import '../providers/player_provider.dart';
+import '../providers/user_provider.dart';
 import '../core/theme/colors.dart';
+import '../screens/admin/admin_upload_screen.dart';
+import '../services/firebase_service.dart';
 
 class SongTile extends StatelessWidget {
   final Song song;
@@ -162,6 +165,19 @@ class SongTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
+                      Consumer<UserProvider>(
+                        builder: (context, userProvider, _) {
+                          if (!userProvider.isAdmin)
+                            return const SizedBox.shrink();
+                          return IconButton(
+                            icon: const Icon(Icons.more_vert_rounded),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () => _showAdminMenu(context, song),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 4),
                       IconButton(
                         icon: Icon(
                           playerProvider.currentSong?.id == song.id &&
@@ -188,6 +204,96 @@ class SongTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showAdminMenu(BuildContext context, Song song) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[600],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined, color: Colors.blue),
+              title: const Text('Edit Song Details'),
+              subtitle: const Text('Update title, artist, or cover art'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AdminUploadScreen(songToEdit: song),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text('Delete Song'),
+              subtitle: const Text('Remove this song from public library'),
+              onTap: () {
+                Navigator.pop(context);
+                _showDeleteConfirmation(context, song);
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, Song song) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Song?'),
+        content: Text(
+            'Are you sure you want to delete "${song.title}"? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await FirebaseService().deleteSong(song.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Song deleted successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }

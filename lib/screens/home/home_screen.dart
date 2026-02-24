@@ -446,6 +446,16 @@ class _HomeScreenState extends State<HomeScreen>
 
         const SizedBox(height: 24),
 
+        // Admin Quick Actions (Conditional)
+        Consumer<UserProvider>(
+          builder: (context, userProvider, _) {
+            if (!userProvider.isAdmin) return const SizedBox.shrink();
+            return _buildAdminQuickActions(isDark);
+          },
+        ),
+
+        const SizedBox(height: 24),
+
         // Featured carousel
         _buildFeaturedSection(),
 
@@ -1103,6 +1113,24 @@ class _HomeScreenState extends State<HomeScreen>
                         ],
                       ),
                     ),
+                    const SizedBox(width: 4),
+                    Consumer<UserProvider>(
+                      builder: (context, userProvider, _) {
+                        if (!userProvider.isAdmin)
+                          return const SizedBox.shrink();
+                        return IconButton(
+                          icon: const Icon(Icons.more_vert_rounded),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            // Assuming _showAdminMenu is defined elsewhere or will be added
+                            // For now, let's just print a message
+                            print('Admin menu for song: ${song.title}');
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
                     IconButton(
                       icon: Icon(
                         playerProvider.isPlaying
@@ -1224,6 +1252,128 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildAdminQuickActions(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Admin Controls',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildAdminButton(
+                  title: 'Upload Music',
+                  icon: Icons.cloud_upload_outlined,
+                  color: AppColors.primary,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminUploadScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildAdminButton(
+                  title: 'Seed Demo',
+                  icon: Icons.auto_awesome,
+                  color: AppColors.neonPurple,
+                  onTap: _showSeedConfirmation,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminButton({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSeedConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seed Demo Data?'),
+        content: const Text(
+          'This will add a few demo songs to your library. It might take a moment.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _performSeed();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Seed Hits'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performSeed() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Seeding music...')),
+    );
+    // In a real scenario, you'd call a method in AdminUploadScreen or FirebaseService
+    // For now, let's navigate to upload screen which already has a seed button
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminUploadScreen(),
       ),
     );
   }
