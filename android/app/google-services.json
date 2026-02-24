@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "447441384618",
+    "project_id": "music-hub-d96f6",
+    "storage_bucket": "music-hub-d96f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447441384618:android:c3d7d2ce442f6a13e04cd3",
+        "android_client_info": {
+          "package_name": "com.harmony.music"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447441384618-et9knuf0vt55u4ouq7ii5upccbs4em30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_Wo1eJ9rEW-ywJQIEhrwezrPBSNF4rVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447441384618-et9knuf0vt55u4ouq7ii5upccbs4em30.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

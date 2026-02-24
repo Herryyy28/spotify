@@ -1,0 +1,56 @@
+Running Gradle task 'assembleDebug'...                          
+Error detected in pubspec.yaml:
+flutter : No file or 
+variants found for asset: as
+sets/animations/headphones.r
+iv.
+At line:1 char:1
++ flutter build apk --debug 
+2>&1 | Tee-Object -Variable 
+buildOutput; $b ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+    + CategoryInfo          
+    : NotSpecified: (No fi  
+  le or vari...headphones   
+ .riv.:String) [], Remot    
+eException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+
+Target 
+debug_android_application 
+failed: Exception: Failed 
+to bundle asset files.
+
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task ':
+app:compileFlutterBuildDebug
+'.
+> Process 'command 'C:\Users
+\praja.HERRY\Downloads\flutt
+er\bin\flutter.bat'' 
+finished with non-zero exit 
+value 1
+
+* Try:
+> Run with --stacktrace 
+option to get the stack 
+trace.
+> Run with --info or 
+--debug option to get more 
+log output.
+> Run with --scan to get 
+full insights.
+> Get more help at 
+https://help.gradle.org.
+
+BUILD FAILED in 6s
+Running Gradle task 'assembleDebug'...                              7.2s
+Gradle task assembleDebug 
+failed with exit code 1

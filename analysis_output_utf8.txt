@@ -1,0 +1,196 @@
+﻿Analyzing spotify...                                            
+
+warning - The 'name' field is required but missing - lib\assets\pubspec.yaml:1:1 - missing_name
+warning - The asset directory 'assets/images/' doesn't exist - lib\assets\pubspec.yaml:45:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/icons/' doesn't exist - lib\assets\pubspec.yaml:46:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/animations/' doesn't exist - lib\assets\pubspec.yaml:47:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/lottie/' doesn't exist - lib\assets\pubspec.yaml:48:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/sounds/' doesn't exist - lib\assets\pubspec.yaml:49:7 - asset_directory_does_not_exist
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\app_theme.dart:131:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\app_theme.dart:160:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\app_theme.dart:247:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\app_theme.dart:274:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\colors.dart:61:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\theme\colors.dart:62:58 - deprecated_member_use
+   info - An uninitialized field should have an explicit type annotation - lib\core\utils\helpers.dart:7:14 - prefer_typing_uninitialized_variables
+   info - The variable name 'DateFormat' isn't a lowerCamelCase identifier - lib\core\utils\helpers.dart:7:14 - non_constant_identifier_names
+warning - The value of the local variable 'logs' isn't used - lib\core\utils\logger.dart:104:11 - unused_local_variable
+  error - Abstract classes can't be instantiated - lib\main.dart:51:47 - instantiate_abstract_class
+  error - The name 'AppTheme' is defined in the libraries 'package:harmony_music/core/theme/app_theme.dart' and 'package:harmony_music/providers/theme_provider.dart' - lib\main.dart:59:20 - ambiguous_import
+  error - The name 'AppTheme' is defined in the libraries 'package:harmony_music/core/theme/app_theme.dart' and 'package:harmony_music/providers/theme_provider.dart' - lib\main.dart:60:24 - ambiguous_import
+  error - The argument type 'AppTheme' can't be assigned to the parameter type 'ThemeMode?'.  - lib\main.dart:61:24 - argument_type_not_assignable
+  error - The name 'PointerDeviceKind' isn't a type, so it can't be used as a type argument - lib\main.dart:94:7 - non_type_as_type_argument
+  error - Undefined name 'PointerDeviceKind' - lib\main.dart:95:5 - undefined_identifier
+  error - Undefined name 'PointerDeviceKind' - lib\main.dart:96:5 - undefined_identifier
+  error - Undefined name 'PointerDeviceKind' - lib\main.dart:97:5 - undefined_identifier
+   info - Don't invoke 'print' in production code - lib\providers\player_provider.dart:98:7 - avoid_print
+  error - 'songCount' can't be used as a setter because it's final - lib\providers\playlist_provider.dart:139:27 - assignment_to_final
+  error - 'totalDuration' can't be used as a setter because it's final - lib\providers\playlist_provider.dart:140:27 - assignment_to_final
+  error - 'songCount' can't be used as a setter because it's final - lib\providers\playlist_provider.dart:160:27 - assignment_to_final
+  error - 'totalDuration' can't be used as a setter because it's final - lib\providers\playlist_provider.dart:161:27 - assignment_to_final
+  error - 'updatedAt' can't be used as a setter because it's final - lib\providers\playlist_provider.dart:180:25 - assignment_to_final
+   info - The variable name 'SharedPreferences' isn't a lowerCamelCase identifier - lib\providers\theme_provider.dart:34:35 - non_constant_identifier_names
+   info - The variable name 'SharedPreferences' isn't a lowerCamelCase identifier - lib\providers\theme_provider.dart:41:49 - non_constant_identifier_names
+  error - 2 positional arguments expected by 'setTheme', but 1 found - lib\providers\theme_provider.dart:51:37 - not_enough_positional_arguments
+  error - 2 positional arguments expected by 'setTheme', but 1 found - lib\providers\theme_provider.dart:54:39 - not_enough_positional_arguments
+  error - 2 positional arguments expected by 'setTheme', but 1 found - lib\providers\theme_provider.dart:57:38 - not_enough_positional_arguments
+   info - Don't invoke 'print' in production code - lib\providers\user_provider.dart:146:9 - avoid_print
+  error - Undefined name 'FirebaseFirestore' - lib\providers\user_provider.dart:250:32 - undefined_identifier
+   info - Don't invoke 'print' in production code - lib\providers\user_provider.dart:263:9 - avoid_print
+   info - Invalid use of a private type in a public API - lib\screens\admin\admin_upload_screen.dart:13:3 - library_private_types_in_public_api
+warning - The value of the local variable 'userProvider' isn't used - lib\screens\admin\admin_upload_screen.dart:53:11 - unused_local_variable
+  error - The method 'File' isn't defined for the type '_AdminUploadScreenState' - lib\screens\admin\admin_upload_screen.dart:132:46 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\admin\admin_upload_screen.dart:258:54 - deprecated_member_use
+warning - The value of the local variable 'song' isn't used - lib\screens\admin\admin_upload_screen.dart:364:13 - unused_local_variable
+   info - Don't use 'BuildContext's across async gaps - lib\screens\admin\admin_upload_screen.dart:382:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\admin\admin_upload_screen.dart:392:28 - use_build_context_synchronously
+   info - Invalid use of a private type in a public API - lib\screens\auth\forgot_password_screen.dart:11:3 - library_private_types_in_public_api
+   info - An uninitialized variable should have an explicit type annotation - lib\screens\auth\forgot_password_screen.dart:24:9 - prefer_typing_uninitialized_variables
+   info - The variable name 'Provider' isn't a lowerCamelCase identifier - lib\screens\auth\forgot_password_screen.dart:24:9 - non_constant_identifier_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\forgot_password_screen.dart:50:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\forgot_password_screen.dart:93:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\forgot_password_screen.dart:136:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\forgot_password_screen.dart:233:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\forgot_password_screen.dart:235:67 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\auth\login_screen.dart:17:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:152:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:192:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:291:64 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:415:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:418:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:470:35 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\auth\signup_screen.dart:14:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:93:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:138:47 - deprecated_member_use
+  error - Arguments of a constant creation must be constant expressions - lib\screens\auth\signup_screen.dart:149:42 - const_with_non_constant_argument
+  error - The getter 'email_outline' isn't defined for the type 'Icons' - lib\screens\auth\signup_screen.dart:149:48 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:184:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:279:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:387:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:455:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:457:67 - deprecated_member_use
+warning - Unused import: 'package:shimmer/shimmer.dart' - lib\screens\home\home_screen.dart:4:8 - unused_import
+warning - Unused import: '../../providers/playlist_provider.dart' - lib\screens\home\home_screen.dart:7:8 - unused_import
+warning - Unused import: '../../models/song_model.dart' - lib\screens\home\home_screen.dart:8:8 - unused_import
+warning - Unused import: '../../widgets/song_tile.dart' - lib\screens\home\home_screen.dart:9:8 - unused_import
+warning - Unused import: '../../widgets/playlist_card.dart' - lib\screens\home\home_screen.dart:10:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\screens\home\home_screen.dart:18:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:71:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:104:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:141:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:243:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:267:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:349:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:377:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:392:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:629:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:652:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:698:33 - deprecated_member_use
+  error - The method 'FadeThroughTransition' isn't defined for the type '_HomeScreenState' - lib\screens\home\home_screen.dart:719:26 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:771:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\home_screen.dart:785:46 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\home\search_screen.dart:16:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\search_screen.dart:94:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\search_screen.dart:165:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\search_screen.dart:404:33 - deprecated_member_use
+warning - Unused import: '../../models/song_model.dart' - lib\screens\library\library_screen.dart:6:8 - unused_import
+warning - Unused import: '../../models/playlist_model.dart' - lib\screens\library\library_screen.dart:7:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\screens\library\library_screen.dart:16:3 - library_private_types_in_public_api
+warning - The value of the local variable 'theme' isn't used - lib\screens\library\library_screen.dart:41:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\library\library_screen.dart:185:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\library\library_screen.dart:306:39 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\library\library_screen.dart:453:31 - use_build_context_synchronously
+warning - Unused import: 'package:rive/rive.dart' - lib\screens\player\player_screen.dart:3:8 - unused_import
+warning - Unused import: '../../widgets/equalizer_widget.dart' - lib\screens\player\player_screen.dart:8:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\screens\player\player_screen.dart:22:3 - library_private_types_in_public_api
+warning - The value of the field '_showLyrics' isn't used - lib\screens\player\player_screen.dart:33:14 - unused_field
+warning - The value of the local variable 'isDark' isn't used - lib\screens\player\player_screen.dart:68:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:99:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:120:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:149:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:289:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:312:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:336:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\player\player_screen.dart:375:43 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\playlist\playlist_detail_screen.dart:20:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\playlist\playlist_detail_screen.dart:66:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\playlist\playlist_detail_screen.dart:66:81 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\playlist\playlist_detail_screen.dart:395:29 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\playlist\playlist_detail_screen.dart:396:29 - use_build_context_synchronously
+   info - The imported package 'rxdart' isn't a dependency of the importing package - lib\services\audio_service.dart:4:8 - depend_on_referenced_packages
+  error - A value of type 'Stream<Duration?>' can't be returned from the function 'durationStream' because it has a return type of 'Stream<Duration>' - lib\services\audio_service.dart:38:42 - return_of_invalid_type
+   info - Don't invoke 'print' in production code - lib\services\audio_service.dart:74:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\audio_service.dart:110:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\audio_service.dart:235:7 - avoid_print
+   info - The imported package 'google_sign_in' isn't a dependency of the importing package - lib\services\auth_service.dart:2:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:google_sign_in/google_sign_in.dart' - lib\services\auth_service.dart:2:8 - uri_does_not_exist
+   info - The imported package 'sign_in_with_apple' isn't a dependency of the importing package - lib\services\auth_service.dart:3:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:sign_in_with_apple/sign_in_with_apple.dart' - lib\services\auth_service.dart:3:8 - uri_does_not_exist
+   info - The imported package 'crypto' isn't a dependency of the importing package - lib\services\auth_service.dart:4:8 - depend_on_referenced_packages
+  error - Undefined class 'GoogleSignIn' - lib\services\auth_service.dart:10:9 - undefined_class
+  error - The method 'GoogleSignIn' isn't defined for the type 'AuthService' - lib\services\auth_service.dart:10:38 - undefined_method
+  error - Undefined class 'GoogleSignInAccount' - lib\services\auth_service.dart:57:13 - undefined_class
+  error - Undefined class 'GoogleSignInAuthentication' - lib\services\auth_service.dart:64:13 - undefined_class
+  error - Undefined name 'SignInWithApple' - lib\services\auth_service.dart:82:17 - undefined_identifier
+  error - Undefined name 'SignInWithApple' - lib\services\auth_service.dart:88:39 - undefined_identifier
+  error - Undefined name 'AppleIDAuthorizationScopes' - lib\services\auth_service.dart:90:13 - undefined_identifier
+  error - Undefined name 'AppleIDAuthorizationScopes' - lib\services\auth_service.dart:91:13 - undefined_identifier
+warning - The value of the field '_cacheManager' isn't used - lib\services\download_service.dart:20:22 - unused_field
+  error - Undefined name 'downloadId' - lib\services\download_service.dart:114:28 - undefined_identifier
+  error - Undefined name 'downloadId' - lib\services\download_service.dart:115:28 - undefined_identifier
+  error - Undefined name 'downloadId' - lib\services\download_service.dart:116:35 - undefined_identifier
+   info - Don't invoke 'print' in production code - lib\services\download_service.dart:173:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\download_service.dart:185:7 - avoid_print
+  error - The method 'log' isn't defined for the type 'DownloadProgress' - lib\services\download_service.dart:279:14 - undefined_method
+  error - The method 'log' isn't defined for the type 'DownloadProgress' - lib\services\download_service.dart:279:27 - undefined_method
+  error - The method 'pow' isn't defined for the type 'DownloadProgress' - lib\services\download_service.dart:280:24 - undefined_method
+  error - The method '[]' can't be unconditionally invoked because the receiver can be 'null' - lib\services\firebase_service.dart:123:13 - unchecked_use_of_nullable_value
+  error - The argument type 'Object?' can't be assigned to the parameter type 'Map<String, dynamic>'.  - lib\services\firebase_service.dart:124:30 - argument_type_not_assignable
+   info - Don't invoke 'print' in production code - lib\services\firebase_service.dart:168:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\firebase_service.dart:511:7 - avoid_print
+warning - The value of the field '_random' isn't used - lib\services\recommendation_service.dart:8:9 - unused_field
+  error - The element type 'Song' can't be assigned to the list type 'List<Song>' - lib\services\recommendation_service.dart:38:12 - list_element_type_not_assignable
+  error - The element type 'Song' can't be assigned to the list type 'List<Song>' - lib\services\recommendation_service.dart:39:12 - list_element_type_not_assignable
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:44:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:57:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:91:7 - avoid_print
+  error - The method 'sort' isn't defined for the type 'Iterable' - lib\services\recommendation_service.dart:140:19 - undefined_method
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:148:7 - avoid_print
+warning - The value of the local variable 'lastWeek' isn't used - lib\services\recommendation_service.dart:156:13 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:171:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:181:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:240:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:273:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:313:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:324:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\recommendation_service.dart:347:7 - avoid_print
+   info - Invalid use of a private type in a public API - lib\widgets\custom_appbar.dart:84:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\custom_appbar.dart:139:33 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\widgets\equalizer_widget.dart:21:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\equalizer_widget.dart:66:37 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\widgets\equalizer_widget.dart:167:3 - library_private_types_in_public_api
+  error - Undefined name 'AppColors' - lib\widgets\equalizer_widget.dart:220:17 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\widgets\equalizer_widget.dart:237:24 - undefined_identifier
+   info - The imported package 'http' isn't a dependency of the importing package - lib\widgets\lyrics_widget.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\widgets\lyrics_widget.dart:16:3 - library_private_types_in_public_api
+warning - The declaration '_onPlaybackPosition' isn't referenced - lib\widgets\lyrics_widget.dart:100:8 - unused_element
+  error - The argument type 'TextStyle?' can't be assigned to the parameter type 'TextStyle'.  - lib\widgets\lyrics_widget.dart:181:18 - argument_type_not_assignable
+   info - Invalid use of a private type in a public API - lib\widgets\lyrics_widget.dart:227:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\mini_player.dart:31:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\mini_player.dart:56:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\mini_player.dart:79:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\mini_player.dart:127:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\mini_player.dart:150:54 - deprecated_member_use
+warning - The value of the local variable 'theme' isn't used - lib\widgets\playlist_card.dart:21:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\playlist_card.dart:40:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\playlist_card.dart:82:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\playlist_card.dart:97:56 - deprecated_member_use
+  error - Undefined name 'theme' - lib\widgets\playlist_card.dart:122:28 - undefined_identifier
+  error - Undefined name 'theme' - lib\widgets\playlist_card.dart:131:28 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\song_tile.dart:34:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\song_tile.dart:42:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\song_tile.dart:165:50 - deprecated_member_use
+warning - The asset directory 'assets/images/' doesn't exist - pubspec.yaml:71:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/icons/' doesn't exist - pubspec.yaml:72:7 - asset_directory_does_not_exist
+warning - The asset directory 'assets/animations/' doesn't exist - pubspec.yaml:73:7 - asset_directory_does_not_exist
+
