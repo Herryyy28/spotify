@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 import 'providers/theme_provider.dart' hide AppTheme;
@@ -18,9 +19,13 @@ import 'providers/user_provider.dart';
 import 'providers/music_provider.dart';
 import 'providers/recommendation_provider.dart';
 import 'providers/analytics_provider.dart';
+import 'providers/social_provider.dart';
+import 'providers/podcast_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
+import 'services/notification_service.dart';
 
 bool _firebaseInitialized = false;
 
@@ -84,13 +89,17 @@ Future<void> main() async {
     AppLogger.error('Critical error during initialization: $e');
   }
 
-  runApp(MyApp(firebaseInitialized: _firebaseInitialized));
+  runApp(MyApp(
+    firebaseInitialized: _firebaseInitialized,
+    onboardingComplete: (await SharedPreferences.getInstance()).getBool('onboarding_complete') ?? false,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final bool firebaseInitialized;
+  final bool onboardingComplete;
 
-  const MyApp({super.key, required this.firebaseInitialized});
+  const MyApp({super.key, required this.firebaseInitialized, this.onboardingComplete = false});
 
   @override
   Widget build(BuildContext context) {
@@ -99,11 +108,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => PlayerProvider()),
         ChangeNotifierProvider(create: (_) => PlaylistProvider()),
+        ChangeNotifierProvider(create: (_) => PodcastProvider()),
         if (firebaseInitialized) ...[
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => MusicProvider()),
           ChangeNotifierProvider(create: (_) => RecommendationProvider()),
           ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
+          ChangeNotifierProvider(create: (_) => SocialProvider()),
         ],
       ],
       child: Consumer<ThemeProvider>(
@@ -127,9 +138,9 @@ class MyApp extends StatelessWidget {
             home: firebaseInitialized
                 ? Consumer<UserProvider>(
                     builder: (context, userProvider, _) {
-                      return userProvider.isAuthenticated
-                          ? const MainScreen()
-                          : const LoginScreen();
+                      if (!userProvider.isAuthenticated) return const LoginScreen();
+                      if (!onboardingComplete) return const OnboardingScreen();
+                      return const MainScreen();
                     },
                   )
                 : const Scaffold(

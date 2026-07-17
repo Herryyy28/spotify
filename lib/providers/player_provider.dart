@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -20,6 +21,15 @@ class PlayerProvider extends ChangeNotifier {
   int _currentIndex = 0;
   double _bufferedProgress = 0;
 
+  // Sleep Timer
+  Timer? _sleepTimer;
+  Duration? _sleepTimerRemaining;
+  Timer? _sleepTimerCountdown;
+  bool _stopAfterSong = false;
+
+  // Crossfade
+  double _crossfadeDuration = 0.0;
+
   // Getters
   bool get isInitialized => _isInitialized;
   bool get isPlaying => _isPlaying;
@@ -33,6 +43,8 @@ class PlayerProvider extends ChangeNotifier {
   List<Song> get currentPlaylist => _currentPlaylist;
   int get currentIndex => _currentIndex;
   double get bufferedProgress => _bufferedProgress;
+  Duration? get sleepTimerRemaining => _sleepTimerRemaining;
+  double get crossfadeDuration => _crossfadeDuration;
 
   // Progress percentage
   double get progress {
@@ -208,8 +220,51 @@ class PlayerProvider extends ChangeNotifier {
     }
   }
 
+  // ========== SLEEP TIMER ==========
+  void setSleepTimer(Duration duration) {
+    cancelSleepTimer();
+    _sleepTimerRemaining = duration;
+    _stopAfterSong = false;
+    notifyListeners();
+
+    _sleepTimerCountdown = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_sleepTimerRemaining != null && _sleepTimerRemaining!.inSeconds > 0) {
+        _sleepTimerRemaining = _sleepTimerRemaining! - const Duration(seconds: 1);
+        notifyListeners();
+      } else {
+        pause();
+        cancelSleepTimer();
+      }
+    });
+  }
+
+  void setSleepTimerAfterSong() {
+    cancelSleepTimer();
+    _stopAfterSong = true;
+    _sleepTimerRemaining = null;
+    notifyListeners();
+    AppLogger.info('Sleep timer: stop after current song');
+  }
+
+  void cancelSleepTimer() {
+    _sleepTimer?.cancel();
+    _sleepTimerCountdown?.cancel();
+    _sleepTimerRemaining = null;
+    _stopAfterSong = false;
+    notifyListeners();
+  }
+
+  // ========== CROSSFADE ==========
+  Future<void> setCrossfadeDuration(double seconds) async {
+    _crossfadeDuration = seconds.clamp(0.0, 12.0);
+    notifyListeners();
+    AppLogger.info('Crossfade duration set to ${_crossfadeDuration}s');
+  }
+
   @override
   void dispose() {
+    _sleepTimer?.cancel();
+    _sleepTimerCountdown?.cancel();
     _audioService.dispose();
     super.dispose();
   }
