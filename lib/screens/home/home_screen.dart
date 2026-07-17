@@ -1116,8 +1116,9 @@ class _HomeScreenState extends State<HomeScreen>
                     const SizedBox(width: 4),
                     Consumer<UserProvider>(
                       builder: (context, userProvider, _) {
-                        if (!userProvider.isAdmin)
+                        if (!userProvider.isAdmin) {
                           return const SizedBox.shrink();
+                        }
                         return IconButton(
                           icon: const Icon(Icons.more_vert_rounded),
                           padding: EdgeInsets.zero,

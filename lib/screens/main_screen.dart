@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/colors.dart';
@@ -23,12 +24,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const SearchScreen(),
-    const LibraryScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -37,10 +32,13 @@ class _MainScreenState extends State<MainScreen> {
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
     final userProvider = Provider.of<UserProvider>(context);
 
-    // If user is Admin, show Admin Dashboard exclusively
-    if (userProvider.isAdmin) {
-      return const AdminDashboardScreen();
-    }
+    // List of screens available in the app
+    final List<Widget> screens = [
+      const HomeScreen(),
+      const SearchScreen(),
+      const LibraryScreen(),
+      if (userProvider.isAdmin) const AdminDashboardScreen(),
+    ];
 
     return Scaffold(
       backgroundColor:
@@ -49,27 +47,28 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Expanded(
             child: isMobile
-                ? _buildMobileLayout()
-                : _buildDesktopLayout(isDark, isTablet),
+                ? screens[_selectedIndex >= screens.length ? 0 : _selectedIndex]
+                : _buildDesktopLayout(isDark, isTablet, screens),
           ),
           const NowPlayingBar(),
         ],
       ),
-      bottomNavigationBar: isMobile ? _buildBottomNav(isDark) : null,
+      bottomNavigationBar:
+          isMobile ? _buildBottomNav(isDark, userProvider.isAdmin) : null,
     );
   }
 
   // ========== MOBILE LAYOUT ==========
-  Widget _buildMobileLayout() {
-    return _screens[_selectedIndex];
-  }
+  // Removed _buildMobileLayout as it's now handled inline
 
   // ========== DESKTOP/TABLET LAYOUT ==========
-  Widget _buildDesktopLayout(bool isDark, bool isTablet) {
+  Widget _buildDesktopLayout(bool isDark, bool isTablet, List<Widget> screens) {
     return Row(
       children: [
         _buildSidebar(isDark, isTablet),
-        Expanded(child: _screens[_selectedIndex]),
+        Expanded(
+            child:
+                screens[_selectedIndex >= screens.length ? 0 : _selectedIndex]),
       ],
     );
   }
@@ -77,6 +76,8 @@ class _MainScreenState extends State<MainScreen> {
   // ========== SIDEBAR ==========
   Widget _buildSidebar(bool isDark, bool isTablet) {
     final sidebarWidth = isTablet ? 240.0 : 280.0;
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Container(
       width: sidebarWidth,
@@ -138,6 +139,15 @@ class _MainScreenState extends State<MainScreen> {
             isDark: isDark,
             compact: isTablet,
           ),
+
+          if (userProvider.isAdmin)
+            _buildNavItem(
+              icon: Icons.admin_panel_settings_rounded,
+              label: 'Admin Panel',
+              index: 3,
+              isDark: isDark,
+              compact: isTablet,
+            ),
 
           const SizedBox(height: 24),
           Divider(
@@ -267,43 +277,56 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   // ========== BOTTOM NAV (Mobile) ==========
-  Widget _buildBottomNav(bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+  Widget _buildBottomNav(bool isDark, bool isAdmin) {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.black.withOpacity(0.6)
+                : Colors.white.withOpacity(0.6),
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.05),
+                width: 0.5,
+              ),
+            ),
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) => setState(() => _selectedIndex = index),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: isDark ? Colors.grey[400] : Colors.grey[600],
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              label: 'Home',
+          child: SafeArea(
+            child: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: (index) => setState(() => _selectedIndex = index),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: isDark ? Colors.grey[400] : Colors.grey[600],
+              selectedFontSize: 12,
+              unselectedFontSize: 12,
+              type: BottomNavigationBarType.fixed,
+              items: [
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.search_rounded),
+                  label: 'Search',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.library_music_rounded),
+                  label: 'Your Library',
+                ),
+                if (isAdmin)
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.admin_panel_settings_rounded),
+                    label: 'Admin',
+                  ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search_rounded),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.library_music_rounded),
-              label: 'Your Library',
-            ),
-          ],
+          ),
         ),
       ),
     );

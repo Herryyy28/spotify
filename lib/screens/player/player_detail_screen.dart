@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../core/theme/colors.dart';
 import '../../providers/player_provider.dart';
+import '../../widgets/dynamic_theme_builder.dart';
 
 class PlayerDetailScreen extends StatelessWidget {
   const PlayerDetailScreen({super.key});
@@ -27,18 +28,21 @@ class PlayerDetailScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.neonPurple.withOpacity(0.3),
-              isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-              AppColors.neonBlue.withOpacity(0.3),
-            ],
-          ),
-        ),
+      body: DynamicThemeBuilder(
+        imageUrl: currentSong.coverUrl,
+        builder: (context, colors, child) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 600),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: colors,
+              ),
+            ),
+            child: child,
+          );
+        },
         child: SafeArea(
           child: Column(
             children: [

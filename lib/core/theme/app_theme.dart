@@ -126,6 +126,14 @@ class AppTheme {
       }),
     ),
 
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: AppColors.textSecondaryLight,
+      type: BottomNavigationBarType.fixed,
+    ),
+
     // Bottom Sheet Theme
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: AppColors.surfaceLight,
@@ -227,6 +235,14 @@ class AppTheme {
           fontSize: 12,
         );
       }),
+    ),
+
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: AppColors.textSecondaryDark,
+      type: BottomNavigationBarType.fixed,
     ),
 
     bottomSheetTheme: const BottomSheetThemeData(

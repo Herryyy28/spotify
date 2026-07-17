@@ -6,6 +6,7 @@ import '../../providers/player_provider.dart';
 import '../../models/song_model.dart';
 import '../../core/theme/colors.dart';
 import '../../widgets/lyrics_widget.dart';
+import '../../widgets/dynamic_theme_builder.dart';
 
 class PlayerScreen extends StatefulWidget {
   final Song song;
@@ -80,17 +81,21 @@ class _PlayerScreenState extends State<PlayerScreen>
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              theme.colorScheme.primary.withOpacity(0.8),
-              theme.scaffoldBackgroundColor,
-            ],
-          ),
-        ),
+      body: DynamicThemeBuilder(
+        imageUrl: widget.song.coverUrl,
+        builder: (context, colors, child) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 600),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: colors,
+              ),
+            ),
+            child: child,
+          );
+        },
         child: SafeArea(
           child: Column(
             children: [
@@ -101,66 +106,69 @@ class _PlayerScreenState extends State<PlayerScreen>
                   opacity: _fadeAnimation,
                   child: SlideTransition(
                     position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 30,
-                            offset: const Offset(0, 20),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Stack(
-                          children: [
-                            // Animated background
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 500),
-                              child: Image.network(
-                                widget.song.coverUrl,
-                                fit: BoxFit.cover,
-                              ),
+                    child: Hero(
+                      tag: 'song_art_${widget.song.id}',
+                      child: Container(
+                        margin: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 30,
+                              offset: const Offset(0, 20),
                             ),
-
-                            // Visualizer overlay when playing
-                            if (playerProvider.isPlaying)
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(0.5),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            // Play/Pause indicator
-                            if (!playerProvider.isPlaying)
-                              const Center(
-                                child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundColor: Colors.white24,
-                                  child: CircleAvatar(
-                                    radius: 35,
-                                    backgroundColor: Colors.white,
-                                    child: Icon(
-                                      Icons.play_arrow,
-                                      size: 40,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
                           ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: Stack(
+                            children: [
+                              // Animated background
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 500),
+                                child: Image.network(
+                                  widget.song.coverUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                              // Visualizer overlay when playing
+                              if (playerProvider.isPlaying)
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.5),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              // Play/Pause indicator
+                              if (!playerProvider.isPlaying)
+                                const Center(
+                                  child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: Colors.white24,
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundColor: Colors.white,
+                                      child: Icon(
+                                        Icons.play_arrow,
+                                        size: 40,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
