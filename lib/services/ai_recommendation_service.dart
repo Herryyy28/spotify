@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/song_model.dart';
 import '../models/playlist_model.dart';
@@ -57,7 +58,7 @@ class AIRecommendationService {
 
       return recommendations;
     } catch (e) {
-      print('Error getting personalized recommendations: $e');
+      AppLogger.error('Error getting personalized recommendations: $e');
       return [];
     }
   }
@@ -100,7 +101,7 @@ class AIRecommendationService {
 
       return recommendations.take(limit).toList();
     } catch (e) {
-      print('Error getting similar songs: $e');
+      AppLogger.error('Error getting similar songs: $e');
       return [];
     }
   }
@@ -137,7 +138,7 @@ class AIRecommendationService {
       songs.shuffle();
       return songs.take(limit).toList();
     } catch (e) {
-      print('Error getting mood recommendations: $e');
+      AppLogger.error('Error getting mood recommendations: $e');
       return [];
     }
   }
@@ -194,7 +195,7 @@ class AIRecommendationService {
 
       return playlist;
     } catch (e) {
-      print('Error generating smart playlist: $e');
+      AppLogger.error('Error generating smart playlist: $e');
       rethrow;
     }
   }
@@ -219,7 +220,7 @@ class AIRecommendationService {
 
       return newSongs;
     } catch (e) {
-      print('Error getting discover weekly: $e');
+      AppLogger.error('Error getting discover weekly: $e');
       return [];
     }
   }
@@ -263,7 +264,7 @@ class AIRecommendationService {
 
       return mixes;
     } catch (e) {
-      print('Error getting daily mixes: $e');
+      AppLogger.error('Error getting daily mixes: $e');
       return [];
     }
   }

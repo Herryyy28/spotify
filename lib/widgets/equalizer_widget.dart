@@ -65,7 +65,7 @@ class _EqualizerWidgetState extends State<EqualizerWidget>
                   : widget.maxHeight * 0.3,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(
+                color: widget.color.withValues(alpha: 
                   widget.isPlaying ? 1.0 : 0.5,
                 ),
                 borderRadius: BorderRadius.circular(2),
@@ -219,7 +219,7 @@ class _SpectrumPainter extends CustomPainter {
     if (!isPlaying) return;
 
     final paint = Paint()
-      ..color = AppColors.primary.withOpacity(0.8)
+      ..color = AppColors.primary.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     final barWidth = size.width / 40;
@@ -236,7 +236,7 @@ class _SpectrumPainter extends CustomPainter {
           barWidth - 2,
           height,
         ),
-        paint..color = AppColors.primary.withOpacity(0.5 + height / size.height * 0.5),
+        paint..color = AppColors.primary.withValues(alpha: 0.5 + height / size.height * 0.5),
       );
     }
   }

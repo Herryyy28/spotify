@@ -63,18 +63,18 @@ class GlassCard extends StatelessWidget {
                               (isDark
                                   ? AppColors.cardDark
                                   : AppColors.cardLight))
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                       (backgroundColor ??
                               (isDark
                                   ? AppColors.cardDark
                                   : AppColors.cardLight))
-                          .withOpacity(0.5),
+                          .withValues(alpha: 0.5),
                     ],
                   ),
               borderRadius: BorderRadius.circular(borderRadius),
               border: border ??
                   Border.all(
-                    color: Colors.white.withOpacity(isDark ? 0.1 : 0.2),
+                    color: Colors.white.withValues(alpha: isDark ? 0.1 : 0.2),
                     width: 1.5,
                   ),
             ),
@@ -210,15 +210,15 @@ class NeumorphicCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.5)
-                : Colors.black.withOpacity(0.1),
+                ? Colors.black.withValues(alpha: 0.5)
+                : Colors.black.withValues(alpha: 0.1),
             offset: const Offset(8, 8),
             blurRadius: 15,
           ),
           BoxShadow(
             color: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.9),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.white.withValues(alpha: 0.9),
             offset: const Offset(-8, -8),
             blurRadius: 15,
           ),

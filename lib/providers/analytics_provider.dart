@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
 import '../services/analytics_service.dart';
@@ -26,7 +27,7 @@ class AnalyticsProvider extends ChangeNotifier {
     try {
       await _analyticsService.trackSongPlay(userId, song);
     } catch (e) {
-      print('Error tracking song play: $e');
+      AppLogger.error('Error tracking song play: $e');
     }
   }
 
@@ -50,7 +51,7 @@ class AnalyticsProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load statistics: $e';
-      print(_error);
+      AppLogger.error(_error);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -68,7 +69,7 @@ class AnalyticsProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load year in review: $e';
-      print(_error);
+      AppLogger.error(_error);
     } finally {
       _isLoading = false;
       notifyListeners();

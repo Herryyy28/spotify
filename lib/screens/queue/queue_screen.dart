@@ -83,14 +83,14 @@ class QueueScreen extends StatelessWidget {
           Icon(
             Icons.queue_music,
             size: 80,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
             'No songs in queue',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 8),
@@ -98,7 +98,7 @@ class QueueScreen extends StatelessWidget {
             'Start playing music to see your queue',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
           ),
         ],
@@ -163,7 +163,7 @@ class QueueScreen extends StatelessWidget {
                       song.artist,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -218,7 +218,7 @@ class QueueScreen extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Colors.transparent,
-              Colors.red.withOpacity(0.8),
+              Colors.red.withValues(alpha: 0.8),
             ],
           ),
         ),
@@ -251,7 +251,7 @@ class QueueScreen extends StatelessWidget {
                 '${index - playerProvider.currentIndex}',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
@@ -293,7 +293,7 @@ class QueueScreen extends StatelessWidget {
           song.artist,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -305,13 +305,13 @@ class QueueScreen extends StatelessWidget {
               _formatDuration(song.durationInSeconds),
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               Icons.drag_handle,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               size: 20,
             ),
           ],

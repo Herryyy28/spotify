@@ -96,36 +96,6 @@ class _LyricsWidgetState extends State<LyricsWidget> {
 
     return lyricLines;
   }
-
-  void _onPlaybackPosition(Duration position) {
-    if (_lyrics.isEmpty) return;
-
-    int newIndex = -1;
-    for (int i = 0; i < _lyrics.length; i++) {
-      final lyric = _lyrics[i];
-      if (lyric.timestamp != null && position >= lyric.timestamp!) {
-        newIndex = i;
-      } else {
-        break;
-      }
-    }
-
-    if (newIndex != _currentLineIndex) {
-      setState(() => _currentLineIndex = newIndex);
-
-      // Scroll to current line
-      if (_currentLineIndex >= 0 && _scrollController.hasClients) {
-        const itemHeight = 40.0; // Approximate height
-        final scrollPosition = _currentLineIndex * itemHeight - 100;
-        _scrollController.animateTo(
-          scrollPosition.clamp(0, _scrollController.position.maxScrollExtent),
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

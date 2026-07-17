@@ -28,7 +28,7 @@ class MiniPlayer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, -5),
                   ),
@@ -53,7 +53,7 @@ class MiniPlayer extends StatelessWidget {
                             boxShadow: [
                               if (playerProvider.isPlaying)
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.5),
+                                  color: AppColors.primary.withValues(alpha: 0.5),
                                   blurRadius: 12,
                                   spreadRadius: 1,
                                 ),
@@ -76,7 +76,7 @@ class MiniPlayer extends StatelessWidget {
                                         end: Alignment.bottomCenter,
                                         colors: [
                                           Colors.transparent,
-                                          Colors.black.withOpacity(0.3),
+                                          Colors.black.withValues(alpha: 0.3),
                                         ],
                                       ),
                                     ),
@@ -124,7 +124,7 @@ class MiniPlayer extends StatelessWidget {
                         // Playback controls
                         Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -147,7 +147,7 @@ class MiniPlayer extends StatelessWidget {
                         // Next button
                         Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(

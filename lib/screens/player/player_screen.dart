@@ -26,7 +26,6 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   int _currentTab = 0;
   bool _isLiked = false;
-  final bool _showLyrics = false;
 
   @override
   void initState() {
@@ -56,7 +55,6 @@ class _PlayerScreenState extends State<PlayerScreen>
   Widget build(BuildContext context) {
     final playerProvider = Provider.of<PlayerProvider>(context);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -114,7 +112,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               blurRadius: 30,
                               offset: const Offset(0, 20),
                             ),
@@ -143,7 +141,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                         end: Alignment.bottomCenter,
                                         colors: [
                                           Colors.transparent,
-                                          Colors.black.withOpacity(0.5),
+                                          Colors.black.withValues(alpha: 0.5),
                                         ],
                                       ),
                                     ),
@@ -284,7 +282,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                     ),
                     child: IconButton(
                       iconSize: 32,
@@ -307,7 +305,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.5),
+                          color: AppColors.primary.withValues(alpha: 0.5),
                           blurRadius: 20,
                           spreadRadius: 2,
                         ),
@@ -331,7 +329,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                     ),
                     child: IconButton(
                       iconSize: 32,
@@ -370,7 +368,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -5),
                     ),

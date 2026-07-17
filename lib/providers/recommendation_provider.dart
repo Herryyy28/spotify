@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
 import '../models/playlist_model.dart';
@@ -45,7 +46,7 @@ class RecommendationProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load recommendations: $e';
-      print(_error);
+      AppLogger.error(_error);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -60,7 +61,7 @@ class RecommendationProvider extends ChangeNotifier {
       notifyListeners();
       return songs;
     } catch (e) {
-      print('Error getting mood recommendations: $e');
+      AppLogger.error('Error getting mood recommendations: $e');
       return [];
     }
   }
@@ -70,7 +71,7 @@ class RecommendationProvider extends ChangeNotifier {
     try {
       return await _aiService.getSimilarSongs(song, limit: 10);
     } catch (e) {
-      print('Error getting similar songs: $e');
+      AppLogger.error('Error getting similar songs: $e');
       return [];
     }
   }
@@ -81,7 +82,7 @@ class RecommendationProvider extends ChangeNotifier {
       return await _aiService.generateSmartPlaylist(theme, userId,
           songCount: 30);
     } catch (e) {
-      print('Error generating smart playlist: $e');
+      AppLogger.error('Error generating smart playlist: $e');
       return null;
     }
   }

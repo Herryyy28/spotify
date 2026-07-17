@@ -284,13 +284,13 @@ class _MainScreenState extends State<MainScreen> {
         child: Container(
           decoration: BoxDecoration(
             color: isDark
-                ? Colors.black.withOpacity(0.6)
-                : Colors.white.withOpacity(0.6),
+                ? Colors.black.withValues(alpha: 0.6)
+                : Colors.white.withValues(alpha: 0.6),
             border: Border(
               top: BorderSide(
                 color: isDark
-                    ? Colors.white.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.05),
                 width: 0.5,
               ),
             ),
@@ -355,7 +355,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
             ),

@@ -35,19 +35,19 @@ class SongTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: isPlaying
-            ? AppColors.primary.withOpacity(0.12)
-            : theme.cardColor.withOpacity(0.6),
+            ? AppColors.primary.withValues(alpha: 0.12)
+            : theme.cardColor.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isPlaying
-              ? AppColors.primary.withOpacity(0.5)
-              : Colors.white.withOpacity(0.05),
+              ? AppColors.primary.withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
         boxShadow: isPlaying
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 )
@@ -96,7 +96,7 @@ class SongTile extends StatelessWidget {
                           width: 54,
                           height: 54,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
+                            color: Colors.black.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Center(

@@ -65,8 +65,8 @@ class _DynamicThemeBuilderState extends State<DynamicThemeBuilder> {
           final secondary = darkMutedColor ?? const Color(0xFF121212);
           
           _currentColors = [
-            primary.withOpacity(0.55),
-            secondary.withOpacity(0.95),
+            primary.withValues(alpha: 0.55),
+            secondary.withValues(alpha: 0.95),
           ];
         });
       }

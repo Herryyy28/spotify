@@ -202,14 +202,14 @@ class AppColors {
   static const Color info = Color(0xFF3B82F6);
 
   // ========== GLASSMORPHISM ==========
-  static Color glassLight = Colors.white.withOpacity(0.15);
-  static Color glassDark = Colors.white.withOpacity(0.05);
-  static Color glassBlur = Colors.white.withOpacity(0.1);
+  static Color glassLight = Colors.white.withValues(alpha: 0.15);
+  static Color glassDark = Colors.white.withValues(alpha: 0.05);
+  static Color glassBlur = Colors.white.withValues(alpha: 0.1);
 
   // ========== SHADOWS ==========
   static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
       blurRadius: 20,
       offset: const Offset(0, 10),
     ),
@@ -217,7 +217,7 @@ class AppColors {
 
   static List<BoxShadow> elevatedShadow = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.15),
+      color: Colors.black.withValues(alpha: 0.15),
       blurRadius: 30,
       offset: const Offset(0, 15),
     ),
@@ -225,7 +225,7 @@ class AppColors {
 
   static List<BoxShadow> neonShadow(Color color) => [
         BoxShadow(
-          color: color.withOpacity(0.5),
+          color: color.withValues(alpha: 0.5),
           blurRadius: 25,
           offset: const Offset(0, 10),
         ),

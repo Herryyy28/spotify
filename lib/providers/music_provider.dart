@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
 import '../models/playlist_model.dart';
@@ -54,7 +55,7 @@ class MusicProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = e.toString();
-      print('Error loading music data: $e');
+      AppLogger.error('Error loading music data: $e');
     } finally {
       _setLoading(false);
     }

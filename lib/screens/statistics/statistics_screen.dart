@@ -62,7 +62,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF1DB954).withOpacity(0.3),
+                      const Color(0xFF1DB954).withValues(alpha: 0.3),
                       const Color(0xFF121212),
                     ],
                   ),
@@ -71,7 +71,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   child: Icon(
                     Icons.bar_chart_rounded,
                     size: 80,
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -286,14 +286,14 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               song.artist,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             trailing: Icon(
               Icons.play_arrow,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
             onTap: () {
               // Play song
@@ -362,13 +362,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.2),
-            color.withOpacity(0.05),
+            color.withValues(alpha: 0.2),
+            color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -390,7 +390,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             title,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -414,7 +414,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -425,7 +425,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             decoration: BoxDecoration(
               color: rank <= 3
                   ? const Color(0xFF1DB954)
-                  : Colors.white.withOpacity(0.1),
+                  : Colors.white.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -471,8 +471,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.2),
-            color.withOpacity(0.05),
+            color.withValues(alpha: 0.2),
+            color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -482,7 +482,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 32),
@@ -496,7 +496,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   title,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -513,7 +513,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
               ],
@@ -549,7 +549,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                       end: Alignment.topCenter,
                       colors: [
                         const Color(0xFF1DB954),
-                        const Color(0xFF1DB954).withOpacity(0.5),
+                        const Color(0xFF1DB954).withValues(alpha: 0.5),
                       ],
                     ),
                     borderRadius: const BorderRadius.vertical(
@@ -563,7 +563,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                     '$index',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
               ],
@@ -593,7 +593,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   days[index],
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -603,7 +603,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                     Container(
                       height: 24,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -653,14 +653,14 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           Icon(
             Icons.bar_chart,
             size: 80,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
             message,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 8),
@@ -668,7 +668,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             'Start listening to see your stats',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
           ),
         ],

@@ -134,7 +134,7 @@ class AdminDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -155,7 +155,7 @@ class AdminDashboardScreen extends StatelessWidget {
           Text(
             'Manage your app content and analyze performance from here.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
             ),
           ),
@@ -182,13 +182,13 @@ class AdminDashboardScreen extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: isDark
-                  ? AppColors.cardDark.withOpacity(0.5)
-                  : Colors.white.withOpacity(0.7),
+                  ? AppColors.cardDark.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.grey.withOpacity(0.2),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey.withValues(alpha: 0.2),
               ),
             ),
             padding: const EdgeInsets.all(16),
@@ -198,7 +198,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

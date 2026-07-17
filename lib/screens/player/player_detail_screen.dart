@@ -57,8 +57,8 @@ class PlayerDetailScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.black.withOpacity(0.3)
-                              : Colors.white.withOpacity(0.3),
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.white.withValues(alpha: 0.3),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.keyboard_arrow_down),
@@ -109,7 +109,7 @@ class PlayerDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.4),
+                          color: AppColors.primary.withValues(alpha: 0.4),
                           blurRadius: 40,
                           offset: const Offset(0, 20),
                         ),
@@ -227,7 +227,7 @@ class PlayerDetailScreen extends StatelessWidget {
                         activeTrackColor: AppColors.primary,
                         inactiveTrackColor: Colors.grey[800],
                         thumbColor: Colors.white,
-                        overlayColor: AppColors.primary.withOpacity(0.2),
+                        overlayColor: AppColors.primary.withValues(alpha: 0.2),
                       ),
                       child: Slider(
                         value:
@@ -300,7 +300,7 @@ class PlayerDetailScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.5),
+                            color: AppColors.primary.withValues(alpha: 0.5),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),

@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/song_model.dart';
@@ -95,7 +96,7 @@ class PlayerProvider extends ChangeNotifier {
       _currentSong = song;
       notifyListeners();
     } catch (e) {
-      print('Error playing song: $e');
+      AppLogger.error('Error playing song: $e');
       rethrow;
     }
   }

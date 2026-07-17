@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/song_model.dart';
 
@@ -33,7 +34,7 @@ class AnalyticsService {
       // Update user stats
       await _updateUserStats(userId, song);
     } catch (e) {
-      print('Error tracking song play: $e');
+      AppLogger.error('Error tracking song play: $e');
     }
   }
 
@@ -78,7 +79,7 @@ class AnalyticsService {
         periodDays: 30,
       );
     } catch (e) {
-      print('Error getting user statistics: $e');
+      AppLogger.error('Error getting user statistics: $e');
       return UserStats.empty();
     }
   }
@@ -120,13 +121,13 @@ class AnalyticsService {
             topSongs.add(Song.fromMap(songDoc.data()!));
           }
         } catch (e) {
-          print('Error fetching song ${entry.key}: $e');
+          AppLogger.error('Error fetching song ${entry.key}: $e');
         }
       }
 
       return topSongs;
     } catch (e) {
-      print('Error getting top songs: $e');
+      AppLogger.error('Error getting top songs: $e');
       return [];
     }
   }
@@ -158,7 +159,7 @@ class AnalyticsService {
         peakDay: _findPeakIndex(weekdayDistribution),
       );
     } catch (e) {
-      print('Error getting listening patterns: $e');
+      AppLogger.error('Error getting listening patterns: $e');
       return ListeningPatterns.empty();
     }
   }
@@ -198,7 +199,7 @@ class AnalyticsService {
         topSongs: topSongs,
       );
     } catch (e) {
-      print('Error getting year in review: $e');
+      AppLogger.error('Error getting year in review: $e');
       return YearInReview.empty(year);
     }
   }
@@ -220,7 +221,7 @@ class AnalyticsService {
         'artists': FieldValue.arrayUnion([song.artist]),
       }, SetOptions(merge: true));
     } catch (e) {
-      print('Error updating user stats: $e');
+      AppLogger.error('Error updating user stats: $e');
     }
   }
 
@@ -258,7 +259,7 @@ class AnalyticsService {
 
       return sortedArtists.take(limit).map((e) => e.key).toList();
     } catch (e) {
-      print('Error getting top artists: $e');
+      AppLogger.error('Error getting top artists: $e');
       return [];
     }
   }
@@ -297,7 +298,7 @@ class AnalyticsService {
 
       return sortedGenres.take(limit).map((e) => e.key).toList();
     } catch (e) {
-      print('Error getting top genres: $e');
+      AppLogger.error('Error getting top genres: $e');
       return [];
     }
   }
@@ -338,13 +339,13 @@ class AnalyticsService {
             topSongs.add(Song.fromMap(songDoc.data()!));
           }
         } catch (e) {
-          print('Error fetching song: $e');
+          AppLogger.error('Error fetching song: $e');
         }
       }
 
       return topSongs;
     } catch (e) {
-      print('Error getting top songs for year: $e');
+      AppLogger.error('Error getting top songs for year: $e');
       return [];
     }
   }

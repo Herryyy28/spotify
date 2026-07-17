@@ -110,7 +110,7 @@ class AppTheme {
     // Navigation Bar Theme
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surfaceLight,
-      indicatorColor: AppColors.primary.withOpacity(0.1),
+      indicatorColor: AppColors.primary.withValues(alpha: 0.1),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
@@ -147,7 +147,7 @@ class AppTheme {
       activeTrackColor: AppColors.primary,
       inactiveTrackColor: AppColors.textHintLight,
       thumbColor: AppColors.primary,
-      overlayColor: AppColors.primary.withOpacity(0.1),
+      overlayColor: AppColors.primary.withValues(alpha: 0.1),
       trackHeight: 4,
       thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
       overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
@@ -221,7 +221,7 @@ class AppTheme {
 
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surfaceDark,
-      indicatorColor: AppColors.primary.withOpacity(0.2),
+      indicatorColor: AppColors.primary.withValues(alpha: 0.2),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
@@ -256,7 +256,7 @@ class AppTheme {
       activeTrackColor: AppColors.primary,
       inactiveTrackColor: AppColors.textHintDark,
       thumbColor: AppColors.primary,
-      overlayColor: AppColors.primary.withOpacity(0.2),
+      overlayColor: AppColors.primary.withValues(alpha: 0.2),
       trackHeight: 4,
     ),
   );

@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
@@ -26,15 +27,15 @@ bool _firebaseInitialized = false;
 Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    print('Starting app initialization...');
+    AppLogger.info('Starting app initialization...');
 
     // Initialize Hive
     try {
       await Hive.initFlutter();
       await Hive.openBox('downloads');
-      print('Hive initialized');
+      AppLogger.info('Hive initialized');
     } catch (e) {
-      print('Error initializing Hive: $e');
+      AppLogger.error('Error initializing Hive: $e');
     }
 
     // Initialize audio background service
@@ -44,9 +45,9 @@ Future<void> main() async {
         androidNotificationChannelName: 'Music Playback',
         androidNotificationOngoing: true,
       );
-      print('Audio service initialized');
+      AppLogger.info('Audio service initialized');
     } catch (e) {
-      print('Error initializing audio service: $e');
+      AppLogger.error('Error initializing audio service: $e');
     }
 
     // Initialize Firebase
@@ -61,14 +62,14 @@ Future<void> main() async {
         );
       }
       _firebaseInitialized = true;
-      print('Firebase initialized successfully');
+      AppLogger.info('Firebase initialized successfully');
     } catch (e) {
       _firebaseInitialized = false;
-      print('Error initializing Firebase: $e');
-      print(
+      AppLogger.error('Error initializing Firebase: $e');
+      AppLogger.info(
         'Note: Firebase requires google-services.json on Android or GoogleService-Info.plist on iOS.',
       );
-      print(
+      AppLogger.info(
         'Run "flutterfire configure" to generate Firebase configuration files.',
       );
     }
@@ -80,7 +81,7 @@ Future<void> main() async {
       DeviceOrientation.landscapeRight,
     ]);
   } catch (e) {
-    print('Critical error during initialization: $e');
+    AppLogger.error('Critical error during initialization: $e');
   }
 
   runApp(MyApp(firebaseInitialized: _firebaseInitialized));

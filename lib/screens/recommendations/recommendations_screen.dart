@@ -107,8 +107,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF1DB954).withOpacity(0.4),
-                      const Color(0xFF1ED760).withOpacity(0.2),
+                      const Color(0xFF1DB954).withValues(alpha: 0.4),
+                      const Color(0xFF1ED760).withValues(alpha: 0.2),
                       const Color(0xFF121212),
                     ],
                   ),
@@ -117,7 +117,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                   child: Icon(
                     Icons.explore,
                     size: 80,
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -246,16 +246,16 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                             end: Alignment.bottomRight,
                             colors: [
                               mood['color'],
-                              mood['color'].withOpacity(0.6),
+                              mood['color'].withValues(alpha: 0.6),
                             ],
                           )
                         : null,
-                    color: isSelected ? null : Colors.white.withOpacity(0.1),
+                    color: isSelected ? null : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
                           ? mood['color']
-                          : Colors.white.withOpacity(0.2),
+                          : Colors.white.withValues(alpha: 0.2),
                       width: 2,
                     ),
                   ),
@@ -353,7 +353,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -372,7 +372,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             blurRadius: 4,
                           ),
                         ],
@@ -405,7 +405,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
               song.artist,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -465,7 +465,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -510,7 +510,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
               playlist.description ?? '',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

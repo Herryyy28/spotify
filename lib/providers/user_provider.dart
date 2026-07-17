@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -133,7 +134,7 @@ class UserProvider extends ChangeNotifier {
       _recentlyPlayed = [];
       notifyListeners();
     } catch (e) {
-      print('DEBUG AUTH ERROR: $e');
+      AppLogger.error('DEBUG AUTH ERROR: $e');
       _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _setLoading(false);
@@ -150,7 +151,7 @@ class UserProvider extends ChangeNotifier {
         await loadRecentlyPlayed();
         notifyListeners();
       } catch (e) {
-        print('Error loading user profile: $e');
+        AppLogger.error('Error loading user profile: $e');
       }
     }
   }
@@ -267,7 +268,7 @@ class UserProvider extends ChangeNotifier {
         }
         notifyListeners();
       } catch (e) {
-        print('Error loading liked songs: $e');
+        AppLogger.error('Error loading liked songs: $e');
       }
     }
   }
@@ -312,7 +313,7 @@ class UserProvider extends ChangeNotifier {
         _recentlyPlayed = await _firebaseService.getRecentlyPlayed(_user!.uid);
         notifyListeners();
       } catch (e) {
-        print('Error loading recently played: $e');
+        AppLogger.error('Error loading recently played: $e');
       }
     }
   }

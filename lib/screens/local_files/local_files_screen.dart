@@ -36,8 +36,8 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.black.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.5),
+                      ? Colors.black.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.arrow_back),
@@ -66,7 +66,7 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
                         Icon(
                           Icons.folder_outlined,
                           size: 48,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         const SizedBox(height: 12),
                         const Text(
@@ -81,7 +81,7 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
                           '${_localSongs.length} songs',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -99,7 +99,7 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.4),
+                        color: AppColors.primary.withValues(alpha: 0.4),
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -163,8 +163,8 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.neonPurple.withOpacity(0.1),
-                  AppColors.neonBlue.withOpacity(0.1),
+                  AppColors.neonPurple.withValues(alpha: 0.1),
+                  AppColors.neonBlue.withValues(alpha: 0.1),
                 ],
               ),
               shape: BoxShape.circle,
@@ -203,7 +203,7 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -246,11 +246,11 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isPlaying
-            ? AppColors.primary.withOpacity(0.1)
-            : (isDark ? AppColors.cardDark.withOpacity(0.5) : Colors.grey[100]),
+            ? AppColors.primary.withValues(alpha: 0.1)
+            : (isDark ? AppColors.cardDark.withValues(alpha: 0.5) : Colors.grey[100]),
         borderRadius: BorderRadius.circular(12),
         border: isPlaying
-            ? Border.all(color: AppColors.primary.withOpacity(0.3), width: 1)
+            ? Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1)
             : null,
       ),
       child: Material(
@@ -270,8 +270,8 @@ class _LocalFilesScreenState extends State<LocalFilesScreen> {
                     borderRadius: BorderRadius.circular(8),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.neonPurple.withOpacity(0.6),
-                        AppColors.neonBlue.withOpacity(0.6),
+                        AppColors.neonPurple.withValues(alpha: 0.6),
+                        AppColors.neonBlue.withValues(alpha: 0.6),
                       ],
                     ),
                   ),

@@ -100,7 +100,7 @@ class _PremiumButtonState extends State<PremiumButton>
             boxShadow: widget.enabled
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.4),
+                      color: AppColors.primary.withValues(alpha: 0.4),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -288,7 +288,7 @@ class _GlowIconButtonState extends State<GlowIconButton>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: effectiveColor.withOpacity(_glowAnimation.value),
+                      color: effectiveColor.withValues(alpha: _glowAnimation.value),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),

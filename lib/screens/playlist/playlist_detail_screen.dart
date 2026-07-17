@@ -63,7 +63,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          isDark ? Colors.black.withOpacity(0.8) : Colors.white.withOpacity(0.9),
+                          isDark ? Colors.black.withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.9),
                         ],
                       ),
                     ),

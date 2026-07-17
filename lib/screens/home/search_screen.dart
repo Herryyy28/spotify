@@ -98,14 +98,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   end: Alignment.bottomRight,
                   colors: [
                     (isDark ? AppColors.surfaceDark : AppColors.surfaceLight)
-                        .withOpacity(0.95),
+                        .withValues(alpha: 0.95),
                     (isDark ? AppColors.cardDark : AppColors.cardLight)
-                        .withOpacity(0.95),
+                        .withValues(alpha: 0.95),
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 5),
                   ),
@@ -121,14 +121,14 @@ class _SearchScreenState extends State<SearchScreen> {
                             (isDark
                                     ? AppColors.elevatedDark
                                     : Colors.grey[100]!)
-                                .withOpacity(0.8),
+                                .withValues(alpha: 0.8),
                             (isDark ? AppColors.cardDark : Colors.grey[50]!)
-                                .withOpacity(0.8),
+                                .withValues(alpha: 0.8),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: AppColors.primary.withOpacity(
+                          color: AppColors.primary.withValues(alpha: 
                             _searchController.text.isNotEmpty ? 0.5 : 0.1,
                           ),
                           width: 2,
@@ -136,7 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         boxShadow: _searchController.text.isNotEmpty
                             ? [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.2),
+                                  color: AppColors.primary.withValues(alpha: 0.2),
                                   blurRadius: 15,
                                   offset: const Offset(0, 5),
                                 ),
@@ -194,7 +194,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     const SizedBox(width: 12),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: TextButton(
@@ -235,7 +235,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             setState(() => _selectedFilter = filter);
                           },
                           backgroundColor: theme.cardColor,
-                          selectedColor: AppColors.primary.withOpacity(0.2),
+                          selectedColor: AppColors.primary.withValues(alpha: 0.2),
                           checkmarkColor: AppColors.primary,
                           labelStyle: TextStyle(
                             color: isSelected ? AppColors.primary : null,
@@ -474,7 +474,7 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),

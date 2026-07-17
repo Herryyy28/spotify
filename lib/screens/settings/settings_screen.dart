@@ -30,8 +30,8 @@ class SettingsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.black.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.5),
+                      ? Colors.black.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.arrow_back),
@@ -91,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -297,7 +297,7 @@ class SettingsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.red.withOpacity(0.3),
+                        color: Colors.red.withValues(alpha: 0.3),
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -369,7 +369,7 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark.withOpacity(0.5) : Colors.grey[100],
+        color: isDark ? AppColors.cardDark.withValues(alpha: 0.5) : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -384,7 +384,7 @@ class SettingsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -436,7 +436,7 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark.withOpacity(0.5) : Colors.grey[100],
+        color: isDark ? AppColors.cardDark.withValues(alpha: 0.5) : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -451,7 +451,7 @@ class SettingsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(

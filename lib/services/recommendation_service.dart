@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/song_model.dart';
@@ -41,7 +42,7 @@ class RecommendationService {
 
       return recommendations.take(30).toList();
     } catch (e) {
-      print('Error getting recommendations: $e');
+      AppLogger.error('Error getting recommendations: $e');
       return [];
     }
   }
@@ -54,7 +55,7 @@ class RecommendationService {
       shuffled.shuffle();
       return shuffled.take(20).toList();
     } catch (e) {
-      print('Error getting daily mix: $e');
+      AppLogger.error('Error getting daily mix: $e');
       return [];
     }
   }
@@ -91,7 +92,7 @@ class RecommendationService {
 
       return unique.take(20).toList();
     } catch (e) {
-      print('Error getting song recommendations: $e');
+      AppLogger.error('Error getting song recommendations: $e');
       return [];
     }
   }
@@ -151,7 +152,7 @@ class RecommendationService {
           .take(20)
           .toList();
     } catch (e) {
-      print('Error getting playlist recommendations: $e');
+      AppLogger.error('Error getting playlist recommendations: $e');
       return [];
     }
   }
@@ -174,7 +175,7 @@ class RecommendationService {
         return Song.fromJson(data);
       }).toList();
     } catch (e) {
-      print('Error getting trending songs: $e');
+      AppLogger.error('Error getting trending songs: $e');
       return [];
     }
   }
@@ -184,7 +185,7 @@ class RecommendationService {
     try {
       return await _firebaseService.getRecentlyPlayed(userId);
     } catch (e) {
-      print('Error getting listening history: $e');
+      AppLogger.error('Error getting listening history: $e');
       return [];
     }
   }
@@ -248,7 +249,7 @@ class RecommendationService {
 
       return unique;
     } catch (e) {
-      print('Error getting collaborative recommendations: $e');
+      AppLogger.error('Error getting collaborative recommendations: $e');
       return [];
     }
   }
@@ -280,7 +281,7 @@ class RecommendationService {
 
       return similarUsers;
     } catch (e) {
-      print('Error finding similar users: $e');
+      AppLogger.error('Error finding similar users: $e');
       return [];
     }
   }
@@ -323,7 +324,7 @@ class RecommendationService {
 
       return unique;
     } catch (e) {
-      print('Error getting content-based recommendations: $e');
+      AppLogger.error('Error getting content-based recommendations: $e');
       return [];
     }
   }
@@ -334,7 +335,7 @@ class RecommendationService {
       // Return popular songs for new users
       return await _firebaseService.getPopularSongs(limit: 30);
     } catch (e) {
-      print('Error getting new user recommendations: $e');
+      AppLogger.error('Error getting new user recommendations: $e');
       return [];
     }
   }
@@ -357,7 +358,7 @@ class RecommendationService {
 
       return songs;
     } catch (e) {
-      print('Error getting liked songs: $e');
+      AppLogger.error('Error getting liked songs: $e');
       return [];
     }
   }

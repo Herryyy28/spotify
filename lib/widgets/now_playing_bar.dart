@@ -35,19 +35,19 @@ class NowPlayingBar extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.black.withOpacity(0.6)
-                  : Colors.white.withOpacity(0.6),
+                  ? Colors.black.withValues(alpha: 0.6)
+                  : Colors.white.withValues(alpha: 0.6),
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.08)
-                      : Colors.black.withOpacity(0.05),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.05),
                   width: 0.5,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 20,
                   offset: const Offset(0, -5),
                 ),
@@ -83,7 +83,7 @@ class NowPlayingBar extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                  color: AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -182,7 +182,7 @@ class NowPlayingBar extends StatelessWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withOpacity(0.4),
+                                color: AppColors.primary.withValues(alpha: 0.4),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),

@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:ui';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
@@ -76,10 +77,10 @@ class _HomeScreenState extends State<HomeScreen>
               Container(
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     width: 1.5,
                   ),
                 ),
@@ -99,10 +100,10 @@ class _HomeScreenState extends State<HomeScreen>
                 Container(
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.neonPurple.withOpacity(0.15),
+                    color: AppColors.neonPurple.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.neonPurple.withOpacity(0.3),
+                      color: AppColors.neonPurple.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
@@ -133,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen>
                               colors: [
                                 AppColors.backgroundDark,
                                 AppColors.surfaceDark,
-                                AppColors.primary.withOpacity(0.1),
+                                AppColors.primary.withValues(alpha: 0.1),
                               ],
                             )
                           : LinearGradient(
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen>
                               colors: [
                                 AppColors.backgroundLight,
                                 AppColors.surfaceLight,
-                                AppColors.primary.withOpacity(0.05),
+                                AppColors.primary.withValues(alpha: 0.05),
                               ],
                             ),
                     ),
@@ -152,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen>
                   Positioned.fill(
                     child: CustomPaint(
                       painter: WavePainter(
-                        color: AppColors.primary.withOpacity(0.08),
+                        color: AppColors.primary.withValues(alpha: 0.08),
                       ),
                     ),
                   ),
@@ -199,10 +200,10 @@ class _HomeScreenState extends State<HomeScreen>
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.15),
+                            color: AppColors.primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -245,8 +246,8 @@ class _HomeScreenState extends State<HomeScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppColors.primary.withOpacity(0.3),
-                            AppColors.neonPurple.withOpacity(0.15),
+                            AppColors.primary.withValues(alpha: 0.3),
+                            AppColors.neonPurple.withValues(alpha: 0.15),
                             Colors.transparent,
                           ],
                         ),
@@ -264,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppColors.neonCyan.withOpacity(0.2),
+                            AppColors.neonCyan.withValues(alpha: 0.2),
                             Colors.transparent,
                           ],
                         ),
@@ -281,8 +282,8 @@ class _HomeScreenState extends State<HomeScreen>
                   border: Border(
                     bottom: BorderSide(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.05),
                     ),
                   ),
                 ),
@@ -366,19 +367,19 @@ class _HomeScreenState extends State<HomeScreen>
                 gradient: LinearGradient(
                   colors: [
                     (isDark ? AppColors.elevatedDark : Colors.grey[100]!)
-                        .withOpacity(0.9),
+                        .withValues(alpha: 0.9),
                     (isDark ? AppColors.cardDark : Colors.grey[50]!)
-                        .withOpacity(0.9),
+                        .withValues(alpha: 0.9),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -412,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen>
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.primary.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -618,7 +619,7 @@ class _HomeScreenState extends State<HomeScreen>
                         index % AppColors.popularGradients.length],
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -647,7 +648,7 @@ class _HomeScreenState extends State<HomeScreen>
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.8),
+                              Colors.black.withValues(alpha: 0.8),
                             ],
                           ),
                         ),
@@ -798,7 +799,7 @@ class _HomeScreenState extends State<HomeScreen>
                         color: Theme.of(context).cardColor,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, 5),
                           ),
@@ -889,7 +890,7 @@ class _HomeScreenState extends State<HomeScreen>
                           index % AppColors.popularGradients.length],
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 15,
                           offset: const Offset(0, 8),
                         ),
@@ -908,7 +909,7 @@ class _HomeScreenState extends State<HomeScreen>
                             Icon(
                               Icons.playlist_play_rounded,
                               size: 48,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -924,7 +925,7 @@ class _HomeScreenState extends State<HomeScreen>
                             Text(
                               '${playlist.songCount} songs',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 12,
                               ),
                             ),
@@ -971,7 +972,7 @@ class _HomeScreenState extends State<HomeScreen>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Colors.white.withOpacity(0.1),
+                        Colors.white.withValues(alpha: 0.1),
                         Colors.transparent,
                       ],
                     ),
@@ -999,13 +1000,13 @@ class _HomeScreenState extends State<HomeScreen>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         'Explore',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1033,16 +1034,16 @@ class _HomeScreenState extends State<HomeScreen>
       height: 72,
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF1E1E1E).withOpacity(0.9)
-            : Colors.white.withOpacity(0.9),
+            ? const Color(0xFF1E1E1E).withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
+          color: Colors.white.withValues(alpha: isDark ? 0.1 : 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 25,
             offset: const Offset(0, 10),
           ),
@@ -1067,7 +1068,7 @@ class _HomeScreenState extends State<HomeScreen>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -1126,7 +1127,7 @@ class _HomeScreenState extends State<HomeScreen>
                           onPressed: () {
                             // Assuming _showAdminMenu is defined elsewhere or will be added
                             // For now, let's just print a message
-                            print('Admin menu for song: ${song.title}');
+                            AppLogger.info('Admin menu for song: ${song.title}');
                           },
                         );
                       },
@@ -1314,10 +1315,10 @@ class _HomeScreenState extends State<HomeScreen>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),

@@ -110,7 +110,7 @@ class _AdminUploadScreenState extends State<AdminUploadScreen> {
                       child: Icon(
                         Icons.cloud_upload_outlined,
                         size: 200,
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                       ),
                     ),
                   ],
@@ -266,7 +266,7 @@ class _AdminUploadScreenState extends State<AdminUploadScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor.withOpacity(0.5),
+        color: Theme.of(context).cardColor.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TextFormField(
@@ -306,7 +306,7 @@ class _AdminUploadScreenState extends State<AdminUploadScreen> {
                       : _selectedGenres.remove(genre);
                 });
               },
-              selectedColor: AppColors.primary.withOpacity(0.3),
+              selectedColor: AppColors.primary.withValues(alpha: 0.3),
               checkmarkColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -327,10 +327,10 @@ class _AdminUploadScreenState extends State<AdminUploadScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor.withOpacity(0.3),
+              color: Theme.of(context).cardColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
             child: child,

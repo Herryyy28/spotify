@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -200,7 +201,7 @@ class FirebaseService {
         'playCount': FieldValue.increment(1),
       });
     } catch (e) {
-      print('Failed to increment play count: $e');
+      AppLogger.error('Failed to increment play count: $e');
     }
   }
 
@@ -528,7 +529,7 @@ class FirebaseService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Firestore error creating profile: $e');
+      AppLogger.error('Firestore error creating profile: $e');
       throw Exception('Failed to create user profile in Firestore: $e');
     }
   }
@@ -607,7 +608,7 @@ class FirebaseService {
       // Update song play count
       await incrementPlayCount(songId);
     } catch (e) {
-      print('Failed to log listening event: $e');
+      AppLogger.error('Failed to log listening event: $e');
     }
   }
 

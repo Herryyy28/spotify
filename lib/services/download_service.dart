@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:math';
@@ -177,7 +178,7 @@ class DownloadService {
       }
       return false;
     } catch (e) {
-      print('Error deleting download: $e');
+      AppLogger.error('Error deleting download: $e');
       return false;
     }
   }
@@ -189,7 +190,7 @@ class DownloadService {
         await deleteDownloadedSong(key as String);
       }
     } catch (e) {
-      print('Error clearing downloads: $e');
+      AppLogger.error('Error clearing downloads: $e');
     }
   }
 

@@ -36,7 +36,6 @@ class _LibraryScreenState extends State<LibraryScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final userProvider = Provider.of<UserProvider>(context);
     final playlistProvider = Provider.of<PlaylistProvider>(context);
 
@@ -180,7 +179,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                     setState(() => _selectedFilter = filter);
                   },
                   backgroundColor: Theme.of(context).cardColor,
-                  selectedColor: AppColors.primary.withOpacity(0.2),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
                   checkmarkColor: AppColors.primary,
                 ),
               );
@@ -301,7 +300,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(

@@ -1,3 +1,4 @@
+import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
@@ -71,7 +72,7 @@ class AudioService {
     _audioPlayer.playbackEventStream.listen((event) {
       // Handle playback events
     }, onError: (Object e, StackTrace stackTrace) {
-      print('Audio error: $e');
+      AppLogger.error('Audio error: $e');
     });
 
     // Set up audio loading interceptor
@@ -107,7 +108,7 @@ class AudioService {
       // Update last played
       _updateLastPlayed(song);
     } catch (e) {
-      print('Error playing song: $e');
+      AppLogger.error('Error playing song: $e');
       rethrow;
     }
   }
@@ -235,7 +236,7 @@ class AudioService {
       final file = await _cacheManager.getSingleFile(url);
       return file.path;
     } catch (e) {
-      print('Error caching audio: $e');
+      AppLogger.error('Error caching audio: $e');
       return null;
     }
   }
