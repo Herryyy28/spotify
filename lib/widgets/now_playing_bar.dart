@@ -216,6 +216,8 @@ class NowPlayingBar extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
