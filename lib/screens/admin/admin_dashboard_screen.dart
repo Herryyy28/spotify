@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
 import 'song_management_screen.dart';
+import 'admin_upload_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -59,6 +60,20 @@ class AdminDashboardScreen extends StatelessWidget {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                     children: [
+                      _buildActionCard(
+                        context,
+                        title: 'Upload Music',
+                        icon: Icons.cloud_upload_outlined,
+                        color: AppColors.neonPurple,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminUploadScreen(),
+                            ),
+                          );
+                        },
+                      ),
                       _buildActionCard(
                         context,
                         title: 'Manage Songs',

@@ -537,10 +537,10 @@ class FirebaseService {
   Future<void> updateUserProfile(
       String userId, Map<String, dynamic> data) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('users').doc(userId).set({
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to update profile: $e');
     }

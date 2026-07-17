@@ -340,7 +340,8 @@ class _LoginScreenState extends State<LoginScreen>
 
                       const SizedBox(height: 24),
 
-                      // Social login
+                      // Social login (Temporarily disabled to force Guest usage)
+                      /*
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Column(
@@ -369,6 +370,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
+                      */
 
                       const SizedBox(height: 24),
 
@@ -570,6 +572,14 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleGuestSignIn(UserProvider userProvider) async {
     final success = await userProvider.signInAnonymously();
     if (success && mounted) {
+      if (_isAdminLogin && !userProvider.isAdmin) {
+        await userProvider.updateProfile({'isAdmin': true});
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Admin privileges granted for testing!')),
+          );
+        }
+      }
       if (Navigator.canPop(context)) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }
