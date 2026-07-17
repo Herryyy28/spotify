@@ -351,20 +351,17 @@ class _LoginScreenState extends State<LoginScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 _buildSocialButton(
-                                  icon: FontAwesomeIcons.google,
-                                  color: Colors.red,
+                                  iconWidget: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 24),
                                   onPressed: () =>
                                       _handleGoogleSignIn(userProvider),
                                 ),
                                 _buildSocialButton(
-                                  icon: FontAwesomeIcons.apple,
-                                  color: isDark ? Colors.white : Colors.black,
+                                  iconWidget: FaIcon(FontAwesomeIcons.apple, color: isDark ? Colors.white : Colors.black, size: 24),
                                   onPressed: () =>
                                       _handleAppleSignIn(userProvider),
                                 ),
                                 _buildSocialButton(
-                                  icon: FontAwesomeIcons.facebook,
-                                  color: Colors.blue,
+                                  iconWidget: const FaIcon(FontAwesomeIcons.facebook, color: Colors.blue, size: 24),
                                   onPressed: () {},
                                 ),
                               ],
@@ -468,8 +465,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
+    required Widget iconWidget,
     required VoidCallback onPressed,
   }) {
     return InkWell(
@@ -489,7 +485,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ],
         ),
-        child: Icon(icon, color: color, size: 24),
+        child: iconWidget,
       ),
     );
   }

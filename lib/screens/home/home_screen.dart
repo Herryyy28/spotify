@@ -484,8 +484,11 @@ class _HomeScreenState extends State<HomeScreen>
     return Consumer<MusicProvider>(
       builder: (context, musicProvider, _) {
         final newHits = musicProvider.newHits; // Assume this list exists
-        if (newHits.isEmpty) {
+        if (musicProvider.isLoading && newHits.isEmpty) {
           return _buildLoadingShimmer();
+        }
+        if (newHits.isEmpty) {
+          return const Center(child: Text('No new hits available.'));
         }
         return AnimationLimiter(
           child: ListView.builder(
@@ -521,8 +524,11 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context, musicProvider, _) {
         final charts =
             musicProvider.charts; // Assume this is a list of playlists
-        if (charts.isEmpty) {
+        if (musicProvider.isLoading && charts.isEmpty) {
           return _buildLoadingShimmer();
+        }
+        if (charts.isEmpty) {
+          return const Center(child: Text('No charts available.'));
         }
         return GridView.builder(
           padding: const EdgeInsets.all(20),
@@ -597,8 +603,14 @@ class _HomeScreenState extends State<HomeScreen>
         Consumer<MusicProvider>(
           builder: (context, musicProvider, _) {
             final featured = musicProvider.featuredPlaylists;
-            if (featured.isEmpty) {
+            if (musicProvider.isLoading && featured.isEmpty) {
               return _buildCarouselShimmer();
+            }
+            if (featured.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Center(child: Text('No featured playlists available.')),
+              );
             }
             return CarouselSlider.builder(
               options: CarouselOptions(
@@ -778,8 +790,14 @@ class _HomeScreenState extends State<HomeScreen>
         Consumer<UserProvider>(
           builder: (context, userProvider, _) {
             final recent = userProvider.recentlyPlayed; // Assume this exists
-            if (recent.isEmpty) {
+            if (userProvider.isLoading && recent.isEmpty) {
               return _buildListShimmer(count: 3, horizontal: true);
+            }
+            if (recent.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text('No recently played songs.', style: TextStyle(color: Colors.grey)),
+              );
             }
             return SizedBox(
               height: 140,
@@ -870,8 +888,14 @@ class _HomeScreenState extends State<HomeScreen>
         Consumer<MusicProvider>(
           builder: (context, musicProvider, _) {
             final playlists = musicProvider.recommendedPlaylists;
-            if (playlists.isEmpty) {
+            if (musicProvider.isLoading && playlists.isEmpty) {
               return _buildListShimmer(count: 5, horizontal: true);
+            }
+            if (playlists.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Text('No recommended playlists available.', style: TextStyle(color: Colors.grey)),
+              );
             }
             return SizedBox(
               height: 200,
