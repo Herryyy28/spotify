@@ -46,7 +46,7 @@ class RecommendationProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load recommendations: $e';
-      AppLogger.error(_error);
+      AppLogger.error(_error!);
     } finally {
       _isLoading = false;
       notifyListeners();

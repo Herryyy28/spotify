@@ -51,7 +51,7 @@ class AnalyticsProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load statistics: $e';
-      AppLogger.error(_error);
+      AppLogger.error(_error!);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -69,7 +69,7 @@ class AnalyticsProvider extends ChangeNotifier {
       _error = null;
     } catch (e) {
       _error = 'Failed to load year in review: $e';
-      AppLogger.error(_error);
+      AppLogger.error(_error!);
     } finally {
       _isLoading = false;
       notifyListeners();
