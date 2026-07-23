@@ -27,7 +27,7 @@ class UserProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isEmailVerified => _user?.emailVerified ?? false;
   bool get isPremium => _profile['premium'] ?? false;
-  bool get isAdmin => true; // Forced to true for testing
+  bool get isAdmin => _profile['isAdmin'] == true || _user?.email?.toLowerCase() == 'prajapatiherry.28@gmail.com';
 
   // Constructor
   UserProvider() {

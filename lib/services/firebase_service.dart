@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:io';
 import '../models/song_model.dart';
 import '../models/artist_model.dart';
@@ -461,17 +464,40 @@ class FirebaseService {
     required String fileName,
     required String userId,
   }) async {
+    if (kIsWeb) throw UnsupportedError('Use uploadSongBytes() on Web platforms.');
     try {
       final ref = _storage
           .ref()
           .child('songs')
           .child(userId)
-          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}');
+          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}.mp3');
 
+      // ignore: avoid_dynamic_calls
       final uploadTask = await ref.putFile(File(filePath));
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
       throw Exception('Failed to upload song: $e');
+    }
+  }
+
+  /// Web-compatible MP3 upload using raw bytes (works on Flutter Web).
+  Future<String> uploadSongBytes({
+    required Uint8List bytes,
+    required String fileName,
+    required String userId,
+  }) async {
+    try {
+      final ref = _storage
+          .ref()
+          .child('songs')
+          .child(userId)
+          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}.mp3');
+
+      final metadata = SettableMetadata(contentType: 'audio/mpeg');
+      final uploadTask = await ref.putData(bytes, metadata);
+      return await uploadTask.ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Failed to upload song bytes: $e');
     }
   }
 
@@ -481,6 +507,7 @@ class FirebaseService {
     required String userId,
     String folder = 'covers',
   }) async {
+    if (kIsWeb) throw UnsupportedError('Use uploadImageBytes() on Web platforms.');
     try {
       final ref = _storage
           .ref()
@@ -488,10 +515,34 @@ class FirebaseService {
           .child(userId)
           .child('$fileName-${DateTime.now().millisecondsSinceEpoch}');
 
+      // ignore: avoid_dynamic_calls
       final uploadTask = await ref.putFile(File(filePath));
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
       throw Exception('Failed to upload image: $e');
+    }
+  }
+
+  /// Web-compatible image upload using raw bytes (works on Flutter Web).
+  Future<String> uploadImageBytes({
+    required Uint8List bytes,
+    required String fileName,
+    required String userId,
+    String folder = 'covers',
+    String contentType = 'image/jpeg',
+  }) async {
+    try {
+      final ref = _storage
+          .ref()
+          .child(folder)
+          .child(userId)
+          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}');
+
+      final metadata = SettableMetadata(contentType: contentType);
+      final uploadTask = await ref.putData(bytes, metadata);
+      return await uploadTask.ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Failed to upload image bytes: $e');
     }
   }
 

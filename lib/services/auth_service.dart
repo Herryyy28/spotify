@@ -15,6 +15,9 @@ class AuthService {
     clientId: kIsWeb
         ? '447441384618-et9knuf0vt55u4ouq7ii5upccbs4em30.apps.googleusercontent.com'
         : null,
+    serverClientId: kIsWeb
+        ? null
+        : '447441384618-et9knuf0vt55u4ouq7ii5upccbs4em30.apps.googleusercontent.com',
   );
 
   // Stream of auth state changes
@@ -104,6 +107,12 @@ class AuthService {
       return credentialResult;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('cancelled')) {
+        throw Exception('Google sign in cancelled');
+      }
+      throw Exception('Google Sign-In failed: $e');
     }
   }
 

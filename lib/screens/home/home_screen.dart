@@ -13,7 +13,7 @@ import '../../providers/music_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../core/theme/colors.dart';
 import '../player/player_screen.dart';
-import '../admin/admin_upload_screen.dart';
+import '../admin/admin_dashboard_screen.dart';
 import 'search_screen.dart';
 import '../../services/firebase_service.dart';
 import '../../widgets/song_tile.dart';
@@ -73,6 +73,29 @@ class _HomeScreenState extends State<HomeScreen>
             elevation: 0,
             backgroundColor: Colors.transparent,
             actions: [
+              if (isAdmin)
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.teal.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.data_object),
+                    color: Colors.teal,
+                    tooltip: 'Desktop Music JSON Manager',
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminDashboardScreen(),
+                      ),
+                    ),
+                  ),
+                ),
               // Search Button
               Container(
                 margin: const EdgeInsets.only(right: 8),
@@ -96,29 +119,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
-              if (isAdmin)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.neonPurple.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.neonPurple.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.admin_panel_settings_outlined),
-                    color: AppColors.neonPurple,
-                    tooltip: 'Admin Upload',
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminUploadScreen(),
-                      ),
-                    ),
-                  ),
-                ),
+
               const SizedBox(width: 8),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -796,7 +797,8 @@ class _HomeScreenState extends State<HomeScreen>
             if (recent.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Text('No recently played songs.', style: TextStyle(color: Colors.grey)),
+                child: Text('No recently played songs.',
+                    style: TextStyle(color: Colors.grey)),
               );
             }
             return SizedBox(
@@ -894,7 +896,8 @@ class _HomeScreenState extends State<HomeScreen>
             if (playlists.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Text('No recommended playlists available.', style: TextStyle(color: Colors.grey)),
+                child: Text('No recommended playlists available.',
+                    style: TextStyle(color: Colors.grey)),
               );
             }
             return SizedBox(
@@ -1151,7 +1154,8 @@ class _HomeScreenState extends State<HomeScreen>
                           onPressed: () {
                             // Assuming _showAdminMenu is defined elsewhere or will be added
                             // For now, let's just print a message
-                            AppLogger.info('Admin menu for song: ${song.title}');
+                            AppLogger.info(
+                                'Admin menu for song: ${song.title}');
                           },
                         );
                       },
@@ -1306,7 +1310,7 @@ class _HomeScreenState extends State<HomeScreen>
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const AdminUploadScreen(),
+                      builder: (context) => const AdminDashboardScreen(),
                     ),
                   ),
                 ),
@@ -1399,7 +1403,7 @@ class _HomeScreenState extends State<HomeScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AdminUploadScreen(),
+        builder: (context) => const AdminDashboardScreen(),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -418,6 +419,36 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 24),
 
+                  // Social sign up section
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Or sign up with',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSocialButton(
+                              iconWidget: const FaIcon(
+                                FontAwesomeIcons.google,
+                                color: Colors.red,
+                                size: 24,
+                              ),
+                              onPressed: () => _handleGoogleSignIn(userProvider),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
                   // Login link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -522,6 +553,48 @@ class _SignupScreenState extends State<SignupScreen> {
         // Pop until we reach the root, main.dart will then show HomeScreen
         Navigator.popUntil(context, (route) => route.isFirst);
       }
+    }
+  }
+
+  Widget _buildSocialButton({
+    required Widget iconWidget,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Center(child: iconWidget),
+      ),
+    );
+  }
+
+  Future<void> _handleGoogleSignIn(UserProvider userProvider) async {
+    final success = await userProvider.signInWithGoogle();
+    if (success && mounted) {
+      if (Navigator.canPop(context)) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } else if (!success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.error ?? 'Google sign in failed'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 

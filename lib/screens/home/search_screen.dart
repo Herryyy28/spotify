@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../providers/player_provider.dart';
 import '../../services/firebase_service.dart';
+import '../../services/saavn_music_service.dart';
 import '../../models/song_model.dart';
 import '../../models/artist_model.dart';
 import '../../models/playlist_model.dart';
@@ -19,6 +20,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
+  final SaavnMusicService _saavnService = SaavnMusicService();
 
   List<Song> _songResults = [];
   List<Artist> _artistResults = [];
@@ -67,11 +69,22 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final songs = await _firebaseService.searchSongs(query);
-      // Also search artists and playlists
+      final results = await Future.wait([
+        _firebaseService.searchSongs(query),
+        _saavnService.searchSongs(query, limit: 20),
+      ]);
+
+      final firebaseSongs = results[0];
+      final onlineSongs = results[1];
+
+      // Combine unique songs by ID
+      final Map<String, Song> uniqueResults = {};
+      for (var song in [...firebaseSongs, ...onlineSongs]) {
+        uniqueResults[song.id] = song;
+      }
 
       setState(() {
-        _songResults = songs;
+        _songResults = uniqueResults.values.toList();
         _isLoading = false;
       });
     } catch (e) {

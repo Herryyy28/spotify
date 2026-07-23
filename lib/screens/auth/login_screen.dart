@@ -24,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen>
 
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
-  bool _isAdminLogin = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -271,19 +270,6 @@ class _LoginScreenState extends State<LoginScreen>
                                 ],
                               ),
 
-                              const SizedBox(height: 16),
-
-                              // Admin Login Toggle
-                              SwitchListTile(
-                                value: _isAdminLogin,
-                                onChanged: (val) =>
-                                    setState(() => _isAdminLogin = val),
-                                title: const Text('Login as Admin'),
-                                activeThumbColor: AppColors.primary,
-                                contentPadding: EdgeInsets.zero,
-                                dense: true,
-                              ),
-
                               const SizedBox(height: 24),
 
                               // Login button
@@ -321,11 +307,9 @@ class _LoginScreenState extends State<LoginScreen>
                                       ? const CircularProgressIndicator(
                                           color: Colors.white,
                                         )
-                                      : Text(
-                                          _isAdminLogin
-                                              ? 'Login as Admin'
-                                              : 'Login',
-                                          style: const TextStyle(
+                                      : const Text(
+                                          'Login',
+                                          style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
@@ -340,8 +324,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                       const SizedBox(height: 24),
 
-                      // Social login (Temporarily disabled to force Guest usage)
-                      /*
+                      // Social login
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Column(
@@ -370,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
-                      */
+
 
                       const SizedBox(height: 24),
 
@@ -494,22 +477,25 @@ class _LoginScreenState extends State<LoginScreen>
 
   Future<void> _handleLogin(UserProvider userProvider) async {
     if (_formKey.currentState!.validate()) {
-      final success = await userProvider.signInWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text,
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      bool success = await userProvider.signInWithEmail(
+        email,
+        password,
       );
 
-      if (success && mounted) {
-        if (_isAdminLogin) {
-          if (!userProvider.isAdmin) {
-            await userProvider.updateProfile({'isAdmin': true});
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Admin privileges granted for testing!')),
-            );
-          }
-        }
+      // Auto-create admin account if it doesn't exist yet
+      if (!success && email.toLowerCase() == 'prajapatiherry.28@gmail.com') {
+        success = await userProvider.signUpWithEmail(
+          email: email,
+          password: password,
+          name: 'Admin',
+        );
+      }
 
-        // If we're on a pushed route, pop to return to the root (which will now show HomeScreen)
+      if (success && mounted) {
+        // If we're on a pushed route, pop to return to the root
         if (Navigator.canPop(context)) {
           Navigator.popUntil(context, (route) => route.isFirst);
         }
@@ -520,14 +506,6 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleGoogleSignIn(UserProvider userProvider) async {
     final success = await userProvider.signInWithGoogle();
     if (success && mounted) {
-      if (_isAdminLogin && !userProvider.isAdmin) {
-        await userProvider.updateProfile({'isAdmin': true});
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Admin privileges granted for testing!')),
-          );
-        }
-      }
       if (Navigator.canPop(context)) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }
@@ -544,18 +522,6 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleAppleSignIn(UserProvider userProvider) async {
     final success = await userProvider.signInWithApple();
     if (success && mounted) {
-      if (_isAdminLogin && !userProvider.isAdmin) {
-        await userProvider.signOut();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Access Denied: Admin privileges required.'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-        return;
-      }
       if (Navigator.canPop(context)) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }
@@ -572,14 +538,6 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleGuestSignIn(UserProvider userProvider) async {
     final success = await userProvider.signInAnonymously();
     if (success && mounted) {
-      if (_isAdminLogin && !userProvider.isAdmin) {
-        await userProvider.updateProfile({'isAdmin': true});
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Admin privileges granted for testing!')),
-          );
-        }
-      }
       if (Navigator.canPop(context)) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }

@@ -5,7 +5,7 @@ import '../models/song_model.dart';
 import '../providers/player_provider.dart';
 import '../providers/user_provider.dart';
 import '../core/theme/colors.dart';
-import '../screens/admin/admin_upload_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
 import '../services/firebase_service.dart';
 
 class SongTile extends StatelessWidget {
@@ -240,7 +240,7 @@ class SongTile extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AdminUploadScreen(songToEdit: song),
+                    builder: (context) => const AdminDashboardScreen(),
                   ),
                 );
               },

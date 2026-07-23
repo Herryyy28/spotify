@@ -44,12 +44,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey:'AIzaSyB_Wo1eJ9rEW-ywJQIEhrwezrPBSNF4rVc', // Using Android key as fallback if same
-    appId: '1:447441384618:web:d2e3b2c1a0', // Placeholder but looking real
+    apiKey: 'AIzaSyB4iq8mssB4VBTgT7sXSKgEfm5Y0BkMMlI',
+    appId: '1:447441384618:web:f2c3dfba8b58015be04cd3',
     messagingSenderId: '447441384618',
     projectId: 'music-hub-d96f6',
     authDomain: 'music-hub-d96f6.firebaseapp.com',
     storageBucket: 'music-hub-d96f6.firebasestorage.app',
+    measurementId: 'G-4V2V2R7DB8',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

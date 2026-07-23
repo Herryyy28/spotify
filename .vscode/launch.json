@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "spotify (Web - Port 5000)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--web-port=5000"
+      ]
+    },
+    {
+      "name": "spotify (Mobile/Default)",
+      "request": "launch",
+      "type": "dart"
+    }
+  ]
+}

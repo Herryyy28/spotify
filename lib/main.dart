@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:harmony_music/screens/admin/admin_upload_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -91,7 +92,9 @@ Future<void> main() async {
 
   runApp(MyApp(
     firebaseInitialized: _firebaseInitialized,
-    onboardingComplete: (await SharedPreferences.getInstance()).getBool('onboarding_complete') ?? false,
+    onboardingComplete: (await SharedPreferences.getInstance())
+            .getBool('onboarding_complete') ??
+        false,
   ));
 }
 
@@ -99,7 +102,10 @@ class MyApp extends StatelessWidget {
   final bool firebaseInitialized;
   final bool onboardingComplete;
 
-  const MyApp({super.key, required this.firebaseInitialized, this.onboardingComplete = false});
+  const MyApp(
+      {super.key,
+      required this.firebaseInitialized,
+      this.onboardingComplete = false});
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +144,10 @@ class MyApp extends StatelessWidget {
             home: firebaseInitialized
                 ? Consumer<UserProvider>(
                     builder: (context, userProvider, _) {
-                      if (!userProvider.isAuthenticated) return const LoginScreen();
+                      if (!userProvider.isAuthenticated)
+                        return const LoginScreen();
+                      if (userProvider.isAdmin)
+                        return const AdminUploadScreen();
                       if (!onboardingComplete) return const OnboardingScreen();
                       return const MainScreen();
                     },
