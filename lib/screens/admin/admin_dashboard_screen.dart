@@ -13,7 +13,14 @@ import '../../services/firebase_service.dart';
 import '../../services/saavn_music_service.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
-  const AdminDashboardScreen({super.key});
+  final Song? songToEdit;
+  final int initialTabIndex;
+
+  const AdminDashboardScreen({
+    super.key,
+    this.songToEdit,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
@@ -57,6 +64,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   @override
   void initState() {
     super.initState();
+    _selectedNavIndex = widget.initialTabIndex;
+    if (widget.songToEdit != null) {
+      final song = widget.songToEdit!;
+      _editingSongId = song.id;
+      _titleController.text = song.title;
+      _artistController.text = song.artist;
+      _albumController.text = song.album;
+      _genreController.text = song.genres.isNotEmpty ? song.genres.first : 'Pop';
+      _durationController.text = song.duration;
+      _audioUrlController.text = song.audioUrl;
+      _coverUrlController.text = song.coverUrl;
+      _selectedNavIndex = 1;
+    }
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -1810,31 +1830,48 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final userId = userProvider.user?.uid ?? 'admin';
 
-      // Upload MP3 file to Firebase Storage if bytes are available
+      // Upload MP3 and Cover image in parallel to optimize speed
       String audioUrl = _audioUrlController.text.trim();
-      if (_audioBytes != null && _audioFileName != null) {
-        _setStatus('Uploading MP3 to Firebase Storage...');
-        setState(() => _uploadProgress = 0.1);
-        audioUrl = await _firebaseService.uploadSongBytes(
-          bytes: _audioBytes!,
-          fileName: _titleController.text.trim(),
-          userId: userId,
-        );
-        setState(() => _uploadProgress = 0.6);
-      }
-
-      // Upload cover image to Firebase Storage if bytes are available
       String coverUrl = _coverUrlController.text.trim().isEmpty
           ? 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80'
           : _coverUrlController.text.trim();
-      if (_coverBytes != null && _coverFileName != null) {
-        _setStatus('Uploading cover image...');
-        coverUrl = await _firebaseService.uploadImageBytes(
-          bytes: _coverBytes!,
-          fileName: 'cover_${_titleController.text.trim()}',
-          userId: userId,
+
+      _setStatus('Uploading files to Firebase Storage...');
+      setState(() => _uploadProgress = 0.2);
+
+      final uploadFutures = <Future<void>>[];
+
+      if (_audioBytes != null && _audioFileName != null) {
+        uploadFutures.add(
+          _firebaseService
+              .uploadSongBytes(
+            bytes: _audioBytes!,
+            fileName: _titleController.text.trim(),
+            userId: userId,
+          )
+              .then((url) {
+            audioUrl = url;
+          }),
         );
-        setState(() => _uploadProgress = 0.85);
+      }
+
+      if (_coverBytes != null && _coverFileName != null) {
+        uploadFutures.add(
+          _firebaseService
+              .uploadImageBytes(
+            bytes: _coverBytes!,
+            fileName: 'cover_${_titleController.text.trim()}',
+            userId: userId,
+          )
+              .then((url) {
+            coverUrl = url;
+          }),
+        );
+      }
+
+      if (uploadFutures.isNotEmpty) {
+        await Future.wait(uploadFutures);
+        setState(() => _uploadProgress = 0.8);
       }
 
       final durationText = _durationController.text.trim();

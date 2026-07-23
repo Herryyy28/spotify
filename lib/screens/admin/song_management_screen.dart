@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:harmony_music/screens/admin/admin_upload_screen.dart';
+import 'admin_dashboard_screen.dart';
 import '../../core/theme/colors.dart';
 import '../../services/firebase_service.dart';
 import '../../models/song_model.dart';
@@ -122,7 +122,10 @@ class _SongManagementScreenState extends State<SongManagementScreen> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AdminUploadScreen()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  const AdminDashboardScreen(initialTabIndex: 1),
+            ),
           );
           if (result == true) _loadSongs();
         },
@@ -200,13 +203,16 @@ class _SongManagementScreenState extends State<SongManagementScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.edit, size: 20),
                                   onPressed: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            AdminUploadScreen(songToEdit: song),
-                                      ),
-                                    );
+                                     final result = await Navigator.push(
+                                       context,
+                                       MaterialPageRoute(
+                                         builder: (context) =>
+                                             AdminDashboardScreen(
+                                           songToEdit: song,
+                                           initialTabIndex: 1,
+                                         ),
+                                       ),
+                                     );
                                     if (result == true) _loadSongs();
                                   },
                                 ),

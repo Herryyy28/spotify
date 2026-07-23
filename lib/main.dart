@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:harmony_music/screens/admin/admin_upload_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,7 +25,6 @@ import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
-import 'services/notification_service.dart';
 
 bool _firebaseInitialized = false;
 
@@ -146,8 +144,6 @@ class MyApp extends StatelessWidget {
                     builder: (context, userProvider, _) {
                       if (!userProvider.isAuthenticated)
                         return const LoginScreen();
-                      if (userProvider.isAdmin)
-                        return const AdminUploadScreen();
                       if (!onboardingComplete) return const OnboardingScreen();
                       return const MainScreen();
                     },

@@ -4,7 +4,6 @@ import '../../core/theme/colors.dart';
 import '../../models/social_model.dart';
 import '../../providers/social_provider.dart';
 import '../../providers/player_provider.dart';
-import '../../providers/user_provider.dart';
 
 class SocialFeedScreen extends StatefulWidget {
   const SocialFeedScreen({super.key});
