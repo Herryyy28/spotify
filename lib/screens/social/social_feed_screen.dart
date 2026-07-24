@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/colors.dart';
 import '../../models/social_model.dart';
+import '../../models/song_model.dart';
 import '../../providers/social_provider.dart';
 import '../../providers/player_provider.dart';
+import '../../providers/listening_room_provider.dart';
+import '../../providers/user_provider.dart';
+import 'listen_room_screen.dart';
 
 class SocialFeedScreen extends StatefulWidget {
   const SocialFeedScreen({super.key});
@@ -116,52 +120,234 @@ class _ActivityTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
 
-    if (socialProvider.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-    }
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _buildListeningRoomCard(context, isDark),
+        const SizedBox(height: 16),
+        if (socialProvider.friendsActivity.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Column(
+              children: [
+                Icon(Icons.people_outline_rounded,
+                    size: 70, color: Colors.grey.withValues(alpha: 0.4)),
+                const SizedBox(height: 12),
+                Text(
+                  'No friend activity yet',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Follow friends to see what they are listening to!',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          )
+        else
+          ...socialProvider.friendsActivity.map((act) => _ActivityCard(
+                activity: act,
+                isDark: isDark,
+                onPlay: () => playerProvider.playSong(act.song),
+              )),
+      ],
+    );
+  }
 
-    if (socialProvider.friendsActivity.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.people_outline_rounded,
-                size: 80, color: Colors.grey.withValues(alpha: 0.4)),
-            const SizedBox(height: 16),
-            Text(
-              'No activity yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Follow friends to see what they\'re listening to',
-              style: TextStyle(color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
-          ],
+  Widget _buildListeningRoomCard(BuildContext context, bool isDark) {
+    final roomProvider = Provider.of<ListeningRoomProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.neonPurple, AppColors.primary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      );
-    }
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.equalizer, color: Colors.white, size: 28),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Shared Listening Room',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Listen together with friends in real-time',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              if (roomProvider.isInRoom)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text('LIVE ACTIVE',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold)),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    if (roomProvider.isInRoom) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ListenRoomScreen()),
+                      );
+                    } else {
+                      final song = playerProvider.currentSong ??
+                          Song(
+                            id: 'demo_song',
+                            title: 'Blinding Lights',
+                            artist: 'The Weeknd',
+                            album: 'After Hours',
+                            duration: '3:20',
+                            durationInSeconds: 200,
+                            audioUrl:
+                                'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                            coverUrl:
+                                'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
+                            releaseDate: DateTime.now(),
+                          );
+                      final room = await roomProvider.createRoom(
+                        song,
+                        userProvider.user?.displayName ?? 'Host',
+                      );
+                      if (room != null && context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ListenRoomScreen()),
+                        );
+                      }
+                    }
+                  },
+                  icon: Icon(
+                      roomProvider.isInRoom ? Icons.volume_up : Icons.add_call,
+                      color: AppColors.primary),
+                  label: Text(
+                      roomProvider.isInRoom ? 'Open Room' : 'Create Room',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _showJoinDialog(context),
+                  icon: const Icon(Icons.key, color: Colors.white),
+                  label: const Text('Join Code',
+                      style: TextStyle(color: Colors.white)),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white70),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-    return RefreshIndicator(
-      onRefresh: () => socialProvider.refreshActivity(),
-      color: AppColors.primary,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: socialProvider.friendsActivity.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 2),
-        itemBuilder: (_, i) {
-          final activity = socialProvider.friendsActivity[i];
-          return _ActivityCard(
-            activity: activity,
-            isDark: isDark,
-            onPlay: () => playerProvider.playSong(activity.song),
-          );
-        },
+  void _showJoinDialog(BuildContext context) {
+    final controller = TextEditingController();
+    final roomProvider = Provider.of<ListeningRoomProvider>(context, listen: false);
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Join Listening Room'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Enter Room Code (e.g. ROOM-4829)',
+            prefixIcon: Icon(Icons.tag),
+          ),
+          textCapitalization: TextCapitalization.characters,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () async {
+              final code = controller.text.trim();
+              if (code.isNotEmpty) {
+                Navigator.pop(dialogCtx);
+                final success = await roomProvider.joinRoom(code, playerProvider);
+                if (context.mounted) {
+                  if (success) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ListenRoomScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Room "$code" not found.'),
+                          backgroundColor: Colors.redAccent),
+                    );
+                  }
+                }
+              }
+            },
+            child: const Text('Join'),
+          ),
+        ],
       ),
     );
   }

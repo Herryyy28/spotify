@@ -21,10 +21,13 @@ import 'providers/recommendation_provider.dart';
 import 'providers/analytics_provider.dart';
 import 'providers/social_provider.dart';
 import 'providers/podcast_provider.dart';
+import 'providers/listening_room_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/admin/admin_dashboard_screen.dart';
+import 'screens/social/listen_room_screen.dart';
 
 bool _firebaseInitialized = false;
 
@@ -113,6 +116,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PlayerProvider()),
         ChangeNotifierProvider(create: (_) => PlaylistProvider()),
         ChangeNotifierProvider(create: (_) => PodcastProvider()),
+        ChangeNotifierProvider(create: (_) => ListeningRoomProvider()),
         if (firebaseInitialized) ...[
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => MusicProvider()),
@@ -139,6 +143,11 @@ class MyApp extends StatelessWidget {
               Locale('es', ''),
               Locale('fr', ''),
             ],
+            routes: {
+              '/admin': (context) => const AdminDashboardScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/room': (context) => const ListenRoomScreen(),
+            },
             home: firebaseInitialized
                 ? Consumer<UserProvider>(
                     builder: (context, userProvider, _) {

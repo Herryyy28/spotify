@@ -485,41 +485,33 @@ class FirebaseService {
     required Uint8List bytes,
     required String fileName,
     required String userId,
+    void Function(double progress)? onProgress,
   }) async {
     try {
       final ref = _storage
           .ref()
           .child('songs')
           .child(userId)
-          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}.mp3');
+          .child('${fileName.replaceAll(RegExp(r'[^\w\s\.-]'), '_')}_${DateTime.now().millisecondsSinceEpoch}.mp3');
 
       final metadata = SettableMetadata(contentType: 'audio/mpeg');
-      final uploadTask = await ref.putData(bytes, metadata);
-      return await uploadTask.ref.getDownloadURL();
+      final task = ref.putData(bytes, metadata);
+
+      if (onProgress != null) {
+        task.snapshotEvents.listen((event) {
+          if (event.totalBytes > 0) {
+            onProgress(event.bytesTransferred / event.totalBytes);
+          }
+        });
+      }
+
+      final snapshot = await task.timeout(
+        const Duration(minutes: 2),
+        onTimeout: () => throw Exception('Upload timed out (2 min). Network speed may be slow or CORS is blocking Firebase Storage. Try using an Audio URL instead.'),
+      );
+      return await snapshot.ref.getDownloadURL();
     } catch (e) {
       throw Exception('Failed to upload song bytes: $e');
-    }
-  }
-
-  Future<String> uploadImage({
-    required String filePath,
-    required String fileName,
-    required String userId,
-    String folder = 'covers',
-  }) async {
-    if (kIsWeb) throw UnsupportedError('Use uploadImageBytes() on Web platforms.');
-    try {
-      final ref = _storage
-          .ref()
-          .child(folder)
-          .child(userId)
-          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}');
-
-      // ignore: avoid_dynamic_calls
-      final uploadTask = await ref.putFile(File(filePath));
-      return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
-      throw Exception('Failed to upload image: $e');
     }
   }
 
@@ -530,17 +522,31 @@ class FirebaseService {
     required String userId,
     String folder = 'covers',
     String contentType = 'image/jpeg',
+    void Function(double progress)? onProgress,
   }) async {
     try {
       final ref = _storage
           .ref()
           .child(folder)
           .child(userId)
-          .child('$fileName-${DateTime.now().millisecondsSinceEpoch}');
+          .child('${fileName.replaceAll(RegExp(r'[^\w\s\.-]'), '_')}_${DateTime.now().millisecondsSinceEpoch}');
 
       final metadata = SettableMetadata(contentType: contentType);
-      final uploadTask = await ref.putData(bytes, metadata);
-      return await uploadTask.ref.getDownloadURL();
+      final task = ref.putData(bytes, metadata);
+
+      if (onProgress != null) {
+        task.snapshotEvents.listen((event) {
+          if (event.totalBytes > 0) {
+            onProgress(event.bytesTransferred / event.totalBytes);
+          }
+        });
+      }
+
+      final snapshot = await task.timeout(
+        const Duration(minutes: 1),
+        onTimeout: () => throw Exception('Image upload timed out (1 min). Check your connection or use a Cover URL.'),
+      );
+      return await snapshot.ref.getDownloadURL();
     } catch (e) {
       throw Exception('Failed to upload image bytes: $e');
     }

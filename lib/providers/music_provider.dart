@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
@@ -44,12 +42,11 @@ class MusicProvider extends ChangeNotifier {
       _songsSubscription?.cancel();
       _songsSubscription = _firebaseService.getSongsStream().listen((firebaseSongs) {
         if (firebaseSongs.isNotEmpty) {
-          _featuredSongs = firebaseSongs.take(5).toList();
-          _popularSongs = firebaseSongs.skip(5).take(10).toList();
-          if (_popularSongs.isEmpty) _popularSongs = List.from(firebaseSongs);
-          _newHits = firebaseSongs;
+          _featuredSongs = _mergeSongs(firebaseSongs, _featuredSongs).take(10).toList();
+          _popularSongs = _mergeSongs(firebaseSongs, _popularSongs).take(15).toList();
+          _newHits = _mergeSongs(firebaseSongs, _newHits);
 
-          _buildPlaylistsFromSongs(firebaseSongs);
+          _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
           _error = null;
           notifyListeners();
         }
@@ -64,9 +61,9 @@ class MusicProvider extends ChangeNotifier {
         _firebaseService.getSongs(limit: 10),
       ]);
 
-      _featuredSongs = results[0];
-      _popularSongs = results[1];
-      _newHits = results[2];
+      _featuredSongs = _mergeSongs(results[0], _featuredSongs);
+      _popularSongs = _mergeSongs(results[1], _popularSongs);
+      _newHits = _mergeSongs(results[2], _newHits);
 
       // If Firebase is empty, populate all sections dynamically from Saavn API!
       if (_featuredSongs.isEmpty && _popularSongs.isEmpty && _newHits.isEmpty) {
@@ -85,6 +82,19 @@ class MusicProvider extends ChangeNotifier {
     }
   }
 
+  List<Song> _mergeSongs(List<Song> priorityList, List<Song> secondaryList) {
+    final Map<String, Song> merged = {};
+    for (final song in priorityList) {
+      merged[song.id] = song;
+    }
+    for (final song in secondaryList) {
+      if (!merged.containsKey(song.id)) {
+        merged[song.id] = song;
+      }
+    }
+    return merged.values.toList();
+  }
+
   Future<void> _loadWebFallbackSongs() async {
     try {
       final results = await Future.wait([
@@ -93,9 +103,9 @@ class MusicProvider extends ChangeNotifier {
         _saavnMusicService.fetchTrendingSongs(query: 'new hits', limit: 12),
       ]);
 
-      _featuredSongs = results[0];
-      _popularSongs = results[1];
-      _newHits = results[2];
+      _featuredSongs = _mergeSongs(_featuredSongs, results[0]);
+      _popularSongs = _mergeSongs(_popularSongs, results[1]);
+      _newHits = _mergeSongs(_newHits, results[2]);
 
       final allFetchedSongs = [..._featuredSongs, ..._popularSongs, ..._newHits];
       _buildPlaylistsFromSongs(allFetchedSongs);

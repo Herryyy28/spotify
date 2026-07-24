@@ -2,17 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "spotify (Web - Port 5000)",
+      "name": "Spotify (Web Port 8080)",
       "request": "launch",
       "type": "dart",
       "args": [
         "-d",
         "chrome",
-        "--web-port=5000"
+        "--web-port=8080"
       ]
     },
     {
-      "name": "spotify (Mobile/Default)",
+      "name": "Spotify (Android / Desktop)",
       "request": "launch",
       "type": "dart"
     }
