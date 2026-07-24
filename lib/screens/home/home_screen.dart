@@ -1201,6 +1201,7 @@ class _HomeScreenState extends State<HomeScreen>
   void _playSong(Song song) {
     final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
     playerProvider.playSong(song);
+    _openPlayerScreen(song);
   }
 
   void _openPlayerScreen(Song song) {

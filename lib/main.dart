@@ -46,15 +46,19 @@ Future<void> main() async {
     }
 
     // Initialize audio background service
-    try {
-      await JustAudioBackground.init(
-        androidNotificationChannelId: 'com.example.music.channel.audio',
-        androidNotificationChannelName: 'Music Playback',
-        androidNotificationOngoing: true,
-      );
-      AppLogger.info('Audio service initialized');
-    } catch (e) {
-      AppLogger.error('Error initializing audio service: $e');
+    if (!kIsWeb) {
+      try {
+        await JustAudioBackground.init(
+          androidNotificationChannelId: 'com.example.music.channel.audio',
+          androidNotificationChannelName: 'Music Playback',
+          androidNotificationOngoing: true,
+        );
+        AppLogger.info('Audio service initialized');
+      } catch (e) {
+        AppLogger.error('Error initializing audio service: $e');
+      }
+    } else {
+      AppLogger.info('Running on Web: skipped background audio service initialization');
     }
 
     // Initialize Firebase

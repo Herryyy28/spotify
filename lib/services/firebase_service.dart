@@ -19,7 +19,15 @@ class FirebaseService {
   // Singleton pattern
   static final FirebaseService _instance = FirebaseService._internal();
   factory FirebaseService() => _instance;
-  FirebaseService._internal();
+  FirebaseService._internal() {
+    try {
+      _firestore.settings = const Settings(
+        persistenceEnabled: true,
+      );
+    } catch (e) {
+      AppLogger.warning('Error setting Firestore persistence: $e');
+    }
+  }
 
   String? get userId => _auth.currentUser?.uid;
   String? get displayName => _auth.currentUser?.displayName;

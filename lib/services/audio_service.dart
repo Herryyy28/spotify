@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/song_model.dart';
 
@@ -88,7 +89,7 @@ class AudioService {
       children: _playlist.value.map((song) {
         return AudioSource.uri(
           Uri.parse(song.audioUrl),
-          tag: song,
+          tag: kIsWeb ? null : song,
         );
       }).toList(),
     );
@@ -190,7 +191,7 @@ class AudioService {
         children: playlist.map((song) {
           return AudioSource.uri(
             Uri.parse(song.audioUrl),
-            tag: song,
+            tag: kIsWeb ? null : song,
           );
         }).toList(),
       ),

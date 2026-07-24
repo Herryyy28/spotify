@@ -7,6 +7,7 @@ import '../providers/user_provider.dart';
 import '../core/theme/colors.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../services/firebase_service.dart';
+import '../screens/player/player_screen.dart';
 
 class SongTile extends StatelessWidget {
   final Song song;
@@ -59,7 +60,15 @@ class SongTile extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onTap ?? () => playerProvider.playSong(song),
+            onTap: onTap ?? () {
+              playerProvider.playSong(song);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PlayerScreen(song: song),
+                ),
+              );
+            },
             borderRadius: BorderRadius.circular(20),
             child: Padding(
               padding: const EdgeInsets.all(10),

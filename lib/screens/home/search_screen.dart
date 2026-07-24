@@ -9,6 +9,7 @@ import '../../models/artist_model.dart';
 import '../../models/playlist_model.dart';
 import '../../widgets/song_tile.dart';
 import '../../core/theme/colors.dart';
+import '../player/player_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -583,6 +584,16 @@ class _SearchScreenState extends State<SearchScreen> {
   void _playSong(Song song) {
     final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
     playerProvider.playSong(song);
+    _openPlayerScreen(song);
+  }
+
+  void _openPlayerScreen(Song song) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlayerScreen(song: song),
+      ),
+    );
   }
 
   void _clearRecentSearches() {
