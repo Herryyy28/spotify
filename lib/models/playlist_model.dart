@@ -155,22 +155,35 @@ class Playlist {
   }
 
   factory Playlist.fromJson(Map<String, dynamic> json) {
+    DateTime parseDateTime(dynamic value) {
+      if (value == null) return DateTime.now();
+      if (value is String) return DateTime.parse(value);
+      if (value is DateTime) return value;
+      try {
+        return (value as dynamic).toDate();
+      } catch (_) {
+        return DateTime.now();
+      }
+    }
+
     return Playlist(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? 'Unnamed Playlist',
       description: json['description'],
       coverUrl: json['coverUrl'],
-      userId: json['userId'],
-      userName: json['userName'],
-      songs: (json['songs'] as List).map((s) => Song.fromJson(s)).toList(),
+      userId: json['userId'] ?? '',
+      userName: json['userName'] ?? 'System',
+      songs: (json['songs'] as List? ?? [])
+          .map((s) => Song.fromJson(s as Map<String, dynamic>))
+          .toList(),
       songCount: json['songCount'] ?? 0,
       totalDuration: json['totalDuration'] ?? 0,
       followersCount: json['followersCount'] ?? 0,
       isPublic: json['isPublic'] ?? true,
       isCollaborative: json['isCollaborative'] ?? false,
       collaborators: List<String>.from(json['collaborators'] ?? []),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: parseDateTime(json['createdAt']),
+      updatedAt: parseDateTime(json['updatedAt']),
       color: json['color'],
       tags: List<String>.from(json['tags'] ?? []),
     );

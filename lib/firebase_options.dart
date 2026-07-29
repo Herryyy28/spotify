@@ -49,7 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '447441384618',
     projectId: 'music-hub-d96f6',
     authDomain: 'music-hub-d96f6.firebaseapp.com',
-    storageBucket: 'music-hub-d96f6.firebasestorage.app',
+    storageBucket: 'music-hub-d96f6.appspot.com',
     measurementId: 'G-4V2V2R7DB8',
   );
 
@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:447441384618:android:c3d7d2ce442f6a13e04cd3',
     messagingSenderId: '447441384618',
     projectId: 'music-hub-d96f6',
-    storageBucket: 'music-hub-d96f6.firebasestorage.app',
+    storageBucket: 'music-hub-d96f6.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

@@ -339,11 +339,29 @@ class FirebaseService {
           .orderBy('updatedAt', descending: true)
           .get();
 
-      return snapshot.docs.map((doc) {
+      final playlists = await Future.wait(snapshot.docs.map((doc) async {
         final data = doc.data();
         data['id'] = doc.id;
+
+        // Fetch songs details safely
+        final songsList = data['songs'] as List? ?? [];
+        final songsResults = await Future.wait(
+          songsList.map((songId) async {
+            try {
+              return await getSong(songId as String);
+            } catch (e) {
+              AppLogger.warning('Failed to load song $songId for playlist ${doc.id}: $e');
+              return null;
+            }
+          }),
+        );
+        final songs = songsResults.whereType<Song>().toList();
+        data['songs'] = songs.map((s) => s.toJson()).toList();
+
         return Playlist.fromJson(data);
-      }).toList();
+      }));
+
+      return playlists;
     } catch (e) {
       throw Exception('Failed to get playlists: $e');
     }
@@ -355,10 +373,19 @@ class FirebaseService {
       final data = doc.data()!;
       data['id'] = doc.id;
 
-      // Fetch songs
+      // Fetch songs details safely
       final songsList = data['songs'] as List? ?? [];
-      final songs = await Future.wait(
-          songsList.map((songId) => getSong(songId as String)));
+      final songsResults = await Future.wait(
+        songsList.map((songId) async {
+          try {
+            return await getSong(songId as String);
+          } catch (e) {
+            AppLogger.warning('Failed to load song $songId for playlist $id: $e');
+            return null;
+          }
+        }),
+      );
+      final songs = songsResults.whereType<Song>().toList();
       data['songs'] = songs.map((s) => s.toJson()).toList();
 
       return Playlist.fromJson(data);

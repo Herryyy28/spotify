@@ -5,6 +5,7 @@ import '../../models/playlist_model.dart';
 import '../../providers/music_provider.dart';
 import '../../providers/playlist_provider.dart';
 import 'playlist_detail_screen.dart';
+import '../../widgets/playlist_card.dart';
 
 class PlaylistScreen extends StatefulWidget {
   final Playlist? playlist;
@@ -44,12 +45,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1E1E2C) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
               Icon(Icons.playlist_add_rounded, color: AppColors.primary),
               SizedBox(width: 10),
-              Text('Create Playlist', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Create Playlist',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
           content: Column(
@@ -62,7 +65,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                   labelText: 'Playlist Name',
                   hintText: 'e.g. My Chill Hits',
                   prefixIcon: const Icon(Icons.title),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -72,7 +76,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                   labelText: 'Description (Optional)',
                   hintText: 'e.g. Songs for coding',
                   prefixIcon: const Icon(Icons.description),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ],
@@ -86,14 +91,16 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () async {
                 final name = _nameController.text.trim();
                 if (name.isEmpty) return;
                 Navigator.pop(context);
 
-                final provider = Provider.of<PlaylistProvider>(context, listen: false);
+                final provider =
+                    Provider.of<PlaylistProvider>(context, listen: false);
                 final success = await provider.createPlaylist(
                   name: name,
                   description: _descController.text.trim(),
@@ -102,8 +109,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(success ? 'Playlist "$name" created!' : 'Failed to create playlist'),
-                      backgroundColor: success ? AppColors.primary : AppColors.error,
+                      content: Text(success
+                          ? 'Playlist "$name" created!'
+                          : 'Failed to create playlist'),
+                      backgroundColor:
+                          success ? AppColors.primary : AppColors.error,
                     ),
                   );
                 }
@@ -126,9 +136,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     final featuredPlaylists = musicProvider.featuredPlaylists;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor:
+          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Playlists', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Playlists',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -174,12 +186,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                         color: Colors.white24,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
+                      child: const Icon(Icons.add_rounded,
+                          color: Colors.white, size: 30),
                     ),
                     const SizedBox(width: 16),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'Create New Playlist',
@@ -192,7 +206,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           SizedBox(height: 4),
                           Text(
                             'Organize your favorite tracks into your own custom mix',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 12),
                           ),
                         ],
                       ),
@@ -205,7 +220,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
 
             // User Playlists Section
             Row(
-              mainAxisAlignment: MainState.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'My Playlists',
@@ -236,11 +251,13 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.queue_music_rounded, size: 48, color: Colors.grey[500]),
+                    Icon(Icons.queue_music_rounded,
+                        size: 48, color: Colors.grey[500]),
                     const SizedBox(height: 12),
                     const Text(
                       'No Playlists Created Yet',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     const Text(
@@ -263,7 +280,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 ),
                 itemCount: userPlaylists.length,
                 itemBuilder: (context, index) {
-                  return _buildPlaylistCard(context, userPlaylists[index], isDark);
+                  final playlist = userPlaylists[index];
+                  return PlaylistCard(
+                    playlist: playlist,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlaylistDetailScreen(playlist: playlist),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
 
@@ -287,7 +315,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 ),
                 itemCount: featuredPlaylists.length,
                 itemBuilder: (context, index) {
-                  return _buildPlaylistCard(context, featuredPlaylists[index], isDark);
+                  final playlist = featuredPlaylists[index];
+                  return PlaylistCard(
+                    playlist: playlist,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlaylistDetailScreen(playlist: playlist),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ],
@@ -298,91 +337,4 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     );
   }
 
-  Widget _buildPlaylistCard(BuildContext context, Playlist playlist, bool isDark) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlaylistDetailScreen(playlist: playlist),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1E2C) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: playlist.coverUrl != null && playlist.coverUrl!.isNotEmpty
-                    ? Image.network(
-                        playlist.coverUrl!,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildPlaceholderCover(isDark),
-                      )
-                    : _buildPlaceholderCover(isDark),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    playlist.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainState.spaceBetween,
-                    children: [
-                      Text(
-                        '${playlist.songCount} songs',
-                        style: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
-                      const Icon(Icons.play_circle_fill_rounded, color: AppColors.primary, size: 20),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderCover(bool isDark) {
-    return Container(
-      color: isDark ? const Color(0xFF2A2A3D) : Colors.grey[300],
-      child: Center(
-        child: Icon(
-          Icons.library_music_rounded,
-          size: 48,
-          color: isDark ? Colors.grey[600] : Colors.grey[500],
-        ),
-      ),
-    );
-  }
 }

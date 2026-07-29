@@ -14,6 +14,7 @@ import '../../providers/user_provider.dart';
 import '../../services/firebase_service.dart';
 import '../../services/saavn_music_service.dart';
 import '../../core/utils/logger.dart';
+import '../playlist/playlist_detail_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   final Song? songToEdit;
@@ -621,78 +622,92 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               itemCount: playlists.length,
               itemBuilder: (context, index) {
                 final playlist = playlists[index];
-                return Container(
+                return Card(
+                  elevation: 0,
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF161622) : Colors.white,
+                  color: isDark ? const Color(0xFF161622) : Colors.white,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
+                    side: BorderSide(
                       color: isDark ? Colors.white10 : Colors.black12,
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: playlist.coverUrl != null && playlist.coverUrl!.isNotEmpty
-                            ? Image.network(
-                                playlist.coverUrl!,
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => _buildPlaylistFallbackIcon(isDark),
-                              )
-                            : _buildPlaylistFallbackIcon(isDark),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              playlist.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${playlist.songCount} Songs • ${playlist.userName.isEmpty ? "System Playlist" : "By " + playlist.userName}',
-                              style: const TextStyle(color: Colors.grey, fontSize: 12),
-                            ),
-                          ],
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlaylistDetailScreen(playlist: playlist),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.playlist_add_rounded, color: AppColors.primary),
-                        tooltip: 'Manage Songs',
-                        onPressed: () => _showManagePlaylistSongsModal(context, playlist),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
-                        tooltip: 'Delete Playlist',
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Delete Playlist'),
-                              content: Text('Delete "${playlist.name}"?'),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('Delete'),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: playlist.coverUrl != null && playlist.coverUrl!.isNotEmpty
+                                ? Image.network(
+                                    playlist.coverUrl!,
+                                    width: 56,
+                                    height: 56,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => _buildPlaylistFallbackIcon(isDark),
+                                  )
+                                : _buildPlaylistFallbackIcon(isDark),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  playlist.name,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${playlist.songCount} Songs • ${playlist.userName.isEmpty ? "System Playlist" : "By " + playlist.userName}',
+                                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                                 ),
                               ],
                             ),
-                          );
-                          if (confirm == true) {
-                            await playlistProvider.deletePlaylist(playlist.id);
-                            _setStatus('Deleted playlist "${playlist.name}"');
-                          }
-                        },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.playlist_add_rounded, color: AppColors.primary),
+                            tooltip: 'Manage Songs',
+                            onPressed: () => _showManagePlaylistSongsModal(context, playlist),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
+                            tooltip: 'Delete Playlist',
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Delete Playlist'),
+                                  content: Text('Delete "${playlist.name}"?'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                await playlistProvider.deletePlaylist(playlist.id);
+                                _setStatus('Deleted playlist "${playlist.name}"');
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 );
               },
