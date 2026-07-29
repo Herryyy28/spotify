@@ -4,6 +4,7 @@ import '../../models/playlist_model.dart';
 import '../../models/song_model.dart';
 import '../../providers/player_provider.dart';
 import '../../providers/playlist_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../widgets/song_tile.dart';
 import '../../core/theme/colors.dart';
 import '../player/player_screen.dart';
@@ -28,8 +29,14 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
     final theme = Theme.of(context);
     final playlistProvider = Provider.of<PlaylistProvider>(context);
     final playerProvider = Provider.of<PlayerProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final isDark = theme.brightness == Brightness.dark;
-    final playlist = widget.playlist;
+    final playlist = playlistProvider.playlists.firstWhere(
+      (p) => p.id == widget.playlist.id,
+      orElse: () => widget.playlist,
+    );
+    
+    final isOwner = playlist.userId == userProvider.user?.uid || userProvider.isAdmin;
 
     return Scaffold(
       body: CustomScrollView(
@@ -213,17 +220,22 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                         value: 'share',
                         child: Text('Share'),
                       ),
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Text('Edit'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
+                      if (isOwner)
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Text('Edit'),
+                        ),
+                      if (isOwner)
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Delete'),
+                        ),
                     ],
                     onSelected: (value) {
                       switch (value) {
+                        case 'edit':
+                          _showEditDialog(context, playlistProvider);
+                          break;
                         case 'delete':
                           _showDeleteDialog(context, playlistProvider);
                           break;
@@ -287,7 +299,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                         ),
                       );
                     },
-                    onMenuTap: () => _showSongOptions(context, song),
+                    onMenuTap: () => _showSongOptions(context, song, isOwner),
                   );
                 },
                 childCount: playlist.songs.length,
@@ -322,7 +334,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
     );
   }
 
-  void _showSongOptions(BuildContext context, Song song) {
+  void _showSongOptions(BuildContext context, Song song, bool isOwner) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -332,18 +344,27 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.playlist_remove),
-              title: const Text('Remove from playlist'),
-              onTap: () {
-                final playlistProvider = Provider.of<PlaylistProvider>(
-                  context,
-                  listen: false,
-                );
-                playlistProvider.removeSongFromPlaylist(widget.playlist.id, song.id);
-                Navigator.pop(context);
-              },
-            ),
+            if (isOwner)
+              ListTile(
+                leading: const Icon(Icons.playlist_remove, color: Colors.redAccent),
+                title: const Text('Remove from playlist'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final playlistProvider = Provider.of<PlaylistProvider>(
+                    context,
+                    listen: false,
+                  );
+                  final success = await playlistProvider.removeSongFromPlaylist(widget.playlist.id, song.id);
+                  if (mounted) {
+                    setState(() {});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(success ? 'Removed "${song.title}" from playlist' : 'Failed to remove song'),
+                      ),
+                    );
+                  }
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.queue_music),
               title: const Text('Add to queue'),
@@ -374,6 +395,63 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, PlaylistProvider provider) {
+    final currentPlaylist = provider.playlists.firstWhere(
+      (p) => p.id == widget.playlist.id,
+      orElse: () => widget.playlist,
+    );
+    final nameController = TextEditingController(text: currentPlaylist.name);
+    final descController = TextEditingController(text: currentPlaylist.description);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Playlist'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Playlist Name'),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Description'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final newName = nameController.text.trim();
+              if (newName.isEmpty) return;
+
+              final updatedPlaylist = currentPlaylist.copyWith(
+                name: newName,
+                description: descController.text.trim(),
+              );
+              await provider.updatePlaylist(updatedPlaylist);
+              
+              if (mounted) {
+                Navigator.pop(context);
+                setState(() {});
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+            ),
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

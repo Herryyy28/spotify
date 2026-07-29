@@ -319,6 +319,18 @@ class FirebaseService {
     }
   }
 
+  Future<void> updatePlaylist(Playlist playlist) async {
+    try {
+      final data = playlist.toJson();
+      data.remove('createdAt');
+      data['updatedAt'] = FieldValue.serverTimestamp();
+      
+      await _firestore.collection('playlists').doc(playlist.id).update(data);
+    } catch (e) {
+      throw Exception('Failed to update playlist: $e');
+    }
+  }
+
   Future<List<Playlist>> getUserPlaylists(String userId) async {
     try {
       final snapshot = await _firestore

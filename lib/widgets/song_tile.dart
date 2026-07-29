@@ -8,6 +8,7 @@ import '../core/theme/colors.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../services/firebase_service.dart';
 import '../screens/player/player_screen.dart';
+import 'add_to_playlist_sheet.dart';
 
 class SongTile extends StatelessWidget {
   final Song song;
@@ -174,18 +175,11 @@ class SongTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Consumer<UserProvider>(
-                        builder: (context, userProvider, _) {
-                          if (!userProvider.isAdmin) {
-                            return const SizedBox.shrink();
-                          }
-                          return IconButton(
-                            icon: const Icon(Icons.more_vert_rounded),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () => _showAdminMenu(context, song),
-                          );
-                        },
+                      IconButton(
+                        icon: const Icon(Icons.more_vert_rounded),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: onMenuTap ?? () => _showSongMenu(context, song),
                       ),
                       const SizedBox(width: 4),
                       IconButton(
@@ -218,7 +212,10 @@ class SongTile extends StatelessWidget {
     );
   }
 
-  void _showAdminMenu(BuildContext context, Song song) {
+  void _showSongMenu(BuildContext context, Song song) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isAdmin = userProvider.isAdmin;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -239,30 +236,42 @@ class SongTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.edit_outlined, color: Colors.blue),
-              title: const Text('Edit Song Details'),
-              subtitle: const Text('Update title, artist, or cover art'),
+              leading: const Icon(Icons.playlist_add_rounded, color: AppColors.primary),
+              title: const Text('Add to Playlist', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Save this track to one of your playlists'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AdminDashboardScreen(),
-                  ),
-                );
+                AddToPlaylistSheet.show(context, song);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Delete Song'),
-              subtitle: const Text('Remove this song from public library'),
-              onTap: () {
-                Navigator.pop(context);
-                _showDeleteConfirmation(context, song);
-              },
-            ),
+            if (isAdmin) ...[
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.edit_outlined, color: Colors.blue),
+                title: const Text('Edit Song Details'),
+                subtitle: const Text('Update title, artist, or cover art'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminDashboardScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                title: const Text('Delete Song'),
+                subtitle: const Text('Remove this song from public library'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context, song);
+                },
+              ),
+            ],
             const SizedBox(height: 20),
           ],
         ),

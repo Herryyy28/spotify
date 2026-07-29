@@ -62,9 +62,9 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
+    apiKey: 'AIzaSyB_Wo1eJ9rEW-ywJQIEhrwezrPBSNF4rVc',
+    appId: '1:447441384618:ios:bd03f50968fccb41e04cd3',
+    messagingSenderId: '447441384618',
     projectId: 'music-hub-d96f6',
     storageBucket: 'music-hub-d96f6.appspot.com',
     iosBundleId: 'com.example.spotify',

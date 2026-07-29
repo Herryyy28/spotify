@@ -97,7 +97,17 @@ class PlaylistProvider extends ChangeNotifier {
   Future<bool> updatePlaylist(Playlist playlist) async {
     _setLoading(true);
     try {
-      // Implement update in Firebase
+      await _firebaseService.updatePlaylist(playlist);
+      
+      // Update in local lists if present
+      final index = _playlists.indexWhere((p) => p.id == playlist.id);
+      if (index != -1) {
+        _playlists[index] = playlist;
+      }
+      if (_currentPlaylist?.id == playlist.id) {
+        _currentPlaylist = playlist;
+      }
+      
       _error = null;
       notifyListeners();
       return true;
@@ -108,6 +118,7 @@ class PlaylistProvider extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
 
   // Delete playlist
   Future<bool> deletePlaylist(String id) async {
@@ -133,14 +144,24 @@ class PlaylistProvider extends ChangeNotifier {
     try {
       await _firebaseService.addSongToPlaylist(playlistId, song.id);
 
-      // Update local playlist if it's the current one
-      if (_currentPlaylist?.id == playlistId) {
-        _currentPlaylist!.songs.add(song);
-        _currentPlaylist!.songCount += 1;
-        _currentPlaylist!.totalDuration += song.durationInSeconds;
-        notifyListeners();
+      final index = _playlists.indexWhere((p) => p.id == playlistId);
+      if (index != -1) {
+        if (!_playlists[index].songs.any((s) => s.id == song.id)) {
+          _playlists[index].songs.add(song);
+          _playlists[index].songCount += 1;
+          _playlists[index].totalDuration += song.durationInSeconds;
+        }
       }
 
+      // Update local playlist if it's the current one
+      if (_currentPlaylist?.id == playlistId) {
+        if (!_currentPlaylist!.songs.any((s) => s.id == song.id)) {
+          _currentPlaylist!.songs.add(song);
+          _currentPlaylist!.songCount += 1;
+          _currentPlaylist!.totalDuration += song.durationInSeconds;
+        }
+      }
+      notifyListeners();
       return true;
     } catch (e) {
       _error = e.toString();
@@ -153,6 +174,18 @@ class PlaylistProvider extends ChangeNotifier {
     try {
       await _firebaseService.removeSongFromPlaylist(playlistId, songId);
 
+      // Update in _playlists list
+      final listIndex = _playlists.indexWhere((p) => p.id == playlistId);
+      if (listIndex != -1) {
+        final songIndex = _playlists[listIndex].songs.indexWhere((s) => s.id == songId);
+        if (songIndex != -1) {
+          final song = _playlists[listIndex].songs[songIndex];
+          _playlists[listIndex].songs.removeAt(songIndex);
+          _playlists[listIndex].songCount -= 1;
+          _playlists[listIndex].totalDuration -= song.durationInSeconds;
+        }
+      }
+
       // Update local playlist if it's the current one
       if (_currentPlaylist?.id == playlistId) {
         final songIndex =
@@ -162,9 +195,9 @@ class PlaylistProvider extends ChangeNotifier {
           _currentPlaylist!.songs.removeAt(songIndex);
           _currentPlaylist!.songCount -= 1;
           _currentPlaylist!.totalDuration -= song.durationInSeconds;
-          notifyListeners();
         }
       }
+      notifyListeners();
 
       return true;
     } catch (e) {
