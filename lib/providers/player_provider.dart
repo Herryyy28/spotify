@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/song_model.dart';
 import '../services/audio_service.dart';
+import '../services/firebase_service.dart';
 
 class PlayerProvider extends ChangeNotifier {
   final AudioService _audioService = AudioService();
@@ -20,6 +21,11 @@ class PlayerProvider extends ChangeNotifier {
   List<Song> _currentPlaylist = [];
   int _currentIndex = 0;
   double _bufferedProgress = 0;
+
+  // Listening duration tracker
+  final _listenStopwatch = Stopwatch();
+  Song? _trackedSong;
+  String? _currentUserId;
 
   // Sleep Timer
   Timer? _sleepTimer;
@@ -75,6 +81,22 @@ class PlayerProvider extends ChangeNotifier {
 
     // Listen to playback info
     _audioService.playbackInfoStream.listen((info) {
+      // Detect song change → flush history for previous song
+      if (_trackedSong?.id != info.currentSong?.id) {
+        _flushListeningHistory();
+        _trackedSong = info.currentSong;
+        if (info.isPlaying) _listenStopwatch
+          ..reset()
+          ..start();
+      }
+
+      // Manage stopwatch based on play/pause state
+      if (info.isPlaying && !_listenStopwatch.isRunning) {
+        _listenStopwatch.start();
+      } else if (!info.isPlaying && _listenStopwatch.isRunning) {
+        _listenStopwatch.stop();
+      }
+
       _currentSong = info.currentSong;
       _currentPosition = info.position;
       _totalDuration = info.duration ?? Duration.zero;
@@ -99,6 +121,29 @@ class PlayerProvider extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  /// Call this after login/logout to keep history accurate.
+  void setUserId(String? uid) {
+    _currentUserId = uid;
+    _audioService.setUserId(uid);
+  }
+
+  void _flushListeningHistory() {
+    _listenStopwatch.stop();
+    final elapsed = _listenStopwatch.elapsed.inSeconds;
+    final song = _trackedSong;
+    // Only log if at least 10 s were played to avoid accidental taps
+    if (song != null && elapsed >= 10 && _currentUserId != null) {
+      FirebaseService()
+          .logListeningEvent(
+            userId: _currentUserId!,
+            songId: song.id,
+            duration: elapsed,
+          )
+          .catchError((e) => AppLogger.error('History flush error: $e'));
+    }
+    _listenStopwatch.reset();
   }
 
   // Playback controls
@@ -263,6 +308,7 @@ class PlayerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _flushListeningHistory();
     _sleepTimer?.cancel();
     _sleepTimerCountdown?.cancel();
     _audioService.dispose();

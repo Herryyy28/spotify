@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/song_model.dart';
+import '../services/firebase_service.dart';
 
 class AudioService {
   static final AudioService _instance = AudioService._internal();
@@ -18,6 +19,10 @@ class AudioService {
   final _repeatMode = BehaviorSubject<LoopMode>.seeded(LoopMode.off);
   final _shuffleMode = BehaviorSubject<bool>.seeded(false);
   final _shuffledIndices = BehaviorSubject<List<int>>.seeded([]);
+
+  // User ID for history logging (set after login)
+  String? _currentUserId;
+  void setUserId(String? uid) => _currentUserId = uid;
 
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerStateSubscription;
@@ -243,8 +248,20 @@ class AudioService {
   }
 
   void _updateLastPlayed(Song song) {
-    // Update last played in database
-    // Increment play count
+    // Increment play count in Firestore (fire-and-forget)
+    FirebaseService().incrementPlayCount(song.id);
+
+    // Log to user's listening history if signed in
+    final uid = _currentUserId;
+    if (uid != null && uid.isNotEmpty) {
+      FirebaseService()
+          .logListeningEvent(
+            userId: uid,
+            songId: song.id,
+            duration: song.durationInSeconds,
+          )
+          .catchError((e) => AppLogger.error('History log error: $e'));
+    }
   }
 
   Future<void> dispose() async {

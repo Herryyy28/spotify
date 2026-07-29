@@ -64,6 +64,12 @@ class Song {
   @HiveField(19)
   final String format;
 
+  @HiveField(20)
+  final String? uploadedByAdminId;
+
+  @HiveField(21)
+  final DateTime? uploadedAt;
+
   Song({
     required this.id,
     required this.title,
@@ -85,6 +91,8 @@ class Song {
     this.tags = const [],
     this.bitrate = 320,
     this.format = 'mp3',
+    this.uploadedByAdminId,
+    this.uploadedAt,
   });
 
   Song copyWith({
@@ -108,6 +116,8 @@ class Song {
     List<String>? tags,
     int? bitrate,
     String? format,
+    String? uploadedByAdminId,
+    DateTime? uploadedAt,
   }) {
     return Song(
       id: id ?? this.id,
@@ -130,6 +140,8 @@ class Song {
       tags: tags ?? this.tags,
       bitrate: bitrate ?? this.bitrate,
       format: format ?? this.format,
+      uploadedByAdminId: uploadedByAdminId ?? this.uploadedByAdminId,
+      uploadedAt: uploadedAt ?? this.uploadedAt,
     );
   }
 
@@ -155,6 +167,8 @@ class Song {
       'tags': tags,
       'bitrate': bitrate,
       'format': format,
+      'uploadedByAdminId': uploadedByAdminId,
+      'uploadedAt': uploadedAt?.toIso8601String(),
     };
   }
 
@@ -180,6 +194,8 @@ class Song {
       tags: List<String>.from(json['tags'] ?? []),
       bitrate: json['bitrate'] ?? 320,
       format: json['format'] ?? 'mp3',
+      uploadedByAdminId: json['uploadedByAdminId'],
+      uploadedAt: json['uploadedAt'] != null ? DateTime.tryParse(json['uploadedAt']) : null,
     );
   }
 

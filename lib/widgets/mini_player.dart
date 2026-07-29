@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
 import '../providers/player_provider.dart';
+import '../providers/user_provider.dart';
 import '../screens/player/player_screen.dart';
 import '../core/theme/colors.dart';
 
@@ -119,6 +120,37 @@ class MiniPlayer extends StatelessWidget {
                               ),
                             ],
                           ),
+                        ),
+
+                        // Like button — wired to UserProvider
+                        Consumer<UserProvider>(
+                          builder: (context, userProvider, _) {
+                            if (!userProvider.isAuthenticated) {
+                              return const SizedBox.shrink();
+                            }
+                            final isLiked =
+                                userProvider.isSongLiked(currentSong.id);
+                            return IconButton(
+                              icon: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: Icon(
+                                  isLiked
+                                      ? Icons.favorite_rounded
+                                      : Icons.favorite_border_rounded,
+                                  key: ValueKey(isLiked),
+                                  color: isLiked ? Colors.red : Colors.grey,
+                                  size: 22,
+                                ),
+                              ),
+                              onPressed: () {
+                                if (isLiked) {
+                                  userProvider.unlikeSong(currentSong.id);
+                                } else {
+                                  userProvider.likeSong(currentSong);
+                                }
+                              },
+                            );
+                          },
                         ),
 
                         // Playback controls

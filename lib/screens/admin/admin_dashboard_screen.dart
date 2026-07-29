@@ -930,7 +930,87 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+
+          // ── New Upload Screen CTA ──────────────────────────────────
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.pushNamed(context, '/upload');
+              if (result == true && mounted) {
+                _setStatus('Song uploaded and added to library!');
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1DB954), Color(0xFF0DA842)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.cloud_upload_rounded,
+                      color: Colors.white, size: 28),
+                  SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Upload via File Picker or URL',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Progress bars, auto duration detection, genre picker',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      color: Colors.white70, size: 16),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    'or fill manually',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey[500] : Colors.grey[600],
+                    ),
+                  ),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
 
           // Form card
           Container(

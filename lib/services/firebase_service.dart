@@ -579,6 +579,7 @@ class FirebaseService {
         'photoUrl': data['photoUrl'] ?? '',
         'createdAt': FieldValue.serverTimestamp(),
         'premium': false,
+        'isAdmin': false, // Set to true manually in Firebase console for admin users
         'preferences': {
           'theme': 'system',
           'quality': 'high',

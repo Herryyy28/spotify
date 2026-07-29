@@ -1,0 +1,57 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Firestore admin check (requires Firestore + Storage same project)
+    function isAdmin() {
+      return isSignedIn() &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    function isOwner(adminId) {
+      return request.auth.uid == adminId;
+    }
+
+    // ─── Song audio files ─────────────────────────────────────────────────────
+    // Admins upload to songs/{adminId}/... ; authenticated users can read/stream.
+
+    match /songs/{adminId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(adminId) &&
+                      isAdmin() &&
+                      request.resource.contentType.matches('audio/.*') &&
+                      request.resource.size < 50 * 1024 * 1024; // 50 MB max
+    }
+
+    // ─── Cover art ────────────────────────────────────────────────────────────
+
+    match /covers/{adminId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(adminId) &&
+                      isAdmin() &&
+                      request.resource.contentType.matches('image/.*') &&
+                      request.resource.size < 10 * 1024 * 1024; // 10 MB max
+    }
+
+    // ─── User profile photos ─────────────────────────────────────────────────
+
+    match /profiles/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if request.auth.uid == userId &&
+                      request.resource.contentType.matches('image/.*') &&
+                      request.resource.size < 5 * 1024 * 1024; // 5 MB max
+    }
+
+    // ─── Deny everything else ─────────────────────────────────────────────────
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -22,11 +22,13 @@ import 'providers/analytics_provider.dart';
 import 'providers/social_provider.dart';
 import 'providers/podcast_provider.dart';
 import 'providers/listening_room_provider.dart';
+import 'providers/song_upload_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/admin/admin_dashboard_screen.dart';
+import 'screens/admin/upload_song_screen.dart';
 import 'screens/social/listen_room_screen.dart';
 
 bool _firebaseInitialized = false;
@@ -121,8 +123,16 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PlaylistProvider()),
         ChangeNotifierProvider(create: (_) => PodcastProvider()),
         ChangeNotifierProvider(create: (_) => ListeningRoomProvider()),
+        ChangeNotifierProvider(create: (_) => SongUploadProvider()),
         if (firebaseInitialized) ...[
-          ChangeNotifierProvider(create: (_) => UserProvider()),
+          // Wire UserProvider after PlayerProvider so auth state forwards userId
+          ChangeNotifierProxyProvider<PlayerProvider, UserProvider>(
+            create: (_) => UserProvider(),
+            update: (_, player, user) {
+              user!.attachPlayerProvider(player);
+              return user;
+            },
+          ),
           ChangeNotifierProvider(create: (_) => MusicProvider()),
           ChangeNotifierProvider(create: (_) => RecommendationProvider()),
           ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
@@ -151,6 +161,7 @@ class MyApp extends StatelessWidget {
               '/admin': (context) => const AdminDashboardScreen(),
               '/login': (context) => const LoginScreen(),
               '/room': (context) => const ListenRoomScreen(),
+              '/upload': (context) => const UploadSongScreen(),
             },
             home: firebaseInitialized
                 ? Consumer<UserProvider>(

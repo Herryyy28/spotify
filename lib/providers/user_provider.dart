@@ -5,10 +5,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/firebase_service.dart';
 import '../models/song_model.dart';
+import 'player_provider.dart';
 
 class UserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final FirebaseService _firebaseService = FirebaseService();
+
+  // Optional reference to PlayerProvider for listening history wiring
+  PlayerProvider? _playerProvider;
+  void attachPlayerProvider(PlayerProvider p) {
+    _playerProvider = p;
+    // Sync current user immediately if already signed in
+    _playerProvider?.setUserId(_user?.uid);
+  }
 
   User? _user;
   Map<String, dynamic> _profile = {};
@@ -421,6 +430,7 @@ class UserProvider extends ChangeNotifier {
 
   void _onAuthStateChanged(User? user) {
     _user = user;
+    _playerProvider?.setUserId(user?.uid);
     if (user != null) {
       _loadUserProfile();
     } else {
