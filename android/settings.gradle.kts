@@ -1,3 +1,5 @@
+rootProject.name = "spotify"
+
 pluginManagement {
     val flutterSdkPath =
         run {
