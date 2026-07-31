@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/playlist_model.dart';
 import '../models/song_model.dart';
-import '../services/firebase_service.dart';
+import '../data/repositories/playlist_repository.dart';
+import '../data/repositories/firestore_playlist_repository.dart';
 import '../services/download_service.dart';
+import '../services/firebase_service.dart'; // Keep for user ID fallback for now
 
 class PlaylistProvider extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final PlaylistRepository _playlistRepository;
   final DownloadService _downloadService = DownloadService();
+  final FirebaseService _firebaseService = FirebaseService();
 
   List<Playlist> _playlists = [];
   Playlist? _currentPlaylist;
@@ -19,7 +22,8 @@ class PlaylistProvider extends ChangeNotifier {
   String? get error => _error;
 
   // Constructor
-  PlaylistProvider() {
+  PlaylistProvider({PlaylistRepository? playlistRepository})
+      : _playlistRepository = playlistRepository ?? FirestorePlaylistRepository() {
     loadPlaylists();
   }
 
@@ -29,7 +33,7 @@ class PlaylistProvider extends ChangeNotifier {
     try {
       final currentUserId = userId ?? _firebaseService.userId;
       if (currentUserId != null) {
-        _playlists = await _firebaseService.getUserPlaylists(currentUserId);
+        _playlists = await _playlistRepository.getUserPlaylists(currentUserId);
       }
       _error = null;
     } catch (e) {
@@ -43,7 +47,7 @@ class PlaylistProvider extends ChangeNotifier {
   Future<void> getPlaylist(String id) async {
     _setLoading(true);
     try {
-      _currentPlaylist = await _firebaseService.getPlaylist(id);
+      _currentPlaylist = await _playlistRepository.getPlaylistById(id);
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -97,7 +101,7 @@ class PlaylistProvider extends ChangeNotifier {
   Future<bool> updatePlaylist(Playlist playlist) async {
     _setLoading(true);
     try {
-      await _firebaseService.updatePlaylist(playlist);
+      await _playlistRepository.updatePlaylist(playlist);
       
       // Update in local lists if present
       final index = _playlists.indexWhere((p) => p.id == playlist.id);
@@ -124,7 +128,7 @@ class PlaylistProvider extends ChangeNotifier {
   Future<bool> deletePlaylist(String id) async {
     _setLoading(true);
     try {
-      await _firebaseService.deletePlaylist(id);
+      await _playlistRepository.deletePlaylist(id);
       _playlists.removeWhere((p) => p.id == id);
       if (_currentPlaylist?.id == id) {
         _currentPlaylist = null;
@@ -142,14 +146,14 @@ class PlaylistProvider extends ChangeNotifier {
   // Add song to playlist
   Future<bool> addSongToPlaylist(String playlistId, Song song) async {
     try {
-      await _firebaseService.addSongToPlaylist(playlistId, song.id);
-
+      Playlist? targetPlaylist;
       final index = _playlists.indexWhere((p) => p.id == playlistId);
       if (index != -1) {
         if (!_playlists[index].songs.any((s) => s.id == song.id)) {
           _playlists[index].songs.add(song);
           _playlists[index].songCount += 1;
           _playlists[index].totalDuration += song.durationInSeconds;
+          targetPlaylist = _playlists[index];
         }
       }
 
@@ -159,7 +163,12 @@ class PlaylistProvider extends ChangeNotifier {
           _currentPlaylist!.songs.add(song);
           _currentPlaylist!.songCount += 1;
           _currentPlaylist!.totalDuration += song.durationInSeconds;
+          targetPlaylist = _currentPlaylist;
         }
+      }
+      
+      if (targetPlaylist != null) {
+        await _playlistRepository.updatePlaylist(targetPlaylist);
       }
       notifyListeners();
       return true;
@@ -172,8 +181,7 @@ class PlaylistProvider extends ChangeNotifier {
   // Remove song from playlist
   Future<bool> removeSongFromPlaylist(String playlistId, String songId) async {
     try {
-      await _firebaseService.removeSongFromPlaylist(playlistId, songId);
-
+      Playlist? targetPlaylist;
       // Update in _playlists list
       final listIndex = _playlists.indexWhere((p) => p.id == playlistId);
       if (listIndex != -1) {
@@ -183,6 +191,7 @@ class PlaylistProvider extends ChangeNotifier {
           _playlists[listIndex].songs.removeAt(songIndex);
           _playlists[listIndex].songCount -= 1;
           _playlists[listIndex].totalDuration -= song.durationInSeconds;
+          targetPlaylist = _playlists[listIndex];
         }
       }
 
@@ -195,7 +204,12 @@ class PlaylistProvider extends ChangeNotifier {
           _currentPlaylist!.songs.removeAt(songIndex);
           _currentPlaylist!.songCount -= 1;
           _currentPlaylist!.totalDuration -= song.durationInSeconds;
+          targetPlaylist = _currentPlaylist;
         }
+      }
+      
+      if (targetPlaylist != null) {
+        await _playlistRepository.updatePlaylist(targetPlaylist);
       }
       notifyListeners();
 
@@ -228,8 +242,10 @@ class PlaylistProvider extends ChangeNotifier {
   // Download playlist
   Future<void> downloadPlaylist(String playlistId) async {
     try {
-      final playlist = await _firebaseService.getPlaylist(playlistId);
-      await _downloadService.downloadPlaylist(playlist.songs);
+      final playlist = await _playlistRepository.getPlaylistById(playlistId);
+      if (playlist != null) {
+        await _downloadService.downloadPlaylist(playlist.songs);
+      }
     } catch (e) {
       _error = e.toString();
     }

@@ -1,15 +1,24 @@
 import 'package:harmony_music/core/utils/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
-import '../services/firebase_service.dart';
 import '../models/song_model.dart';
 import 'player_provider.dart';
+import '../data/repositories/user_repository.dart';
+import '../data/repositories/firestore_user_repository.dart';
+import '../data/repositories/song_repository.dart';
+import '../data/repositories/firestore_song_repository.dart';
 
 class UserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  final FirebaseService _firebaseService = FirebaseService();
+  final UserRepository _userRepository;
+  final SongRepository _songRepository;
+
+  UserProvider({UserRepository? userRepository, SongRepository? songRepository})
+      : _userRepository = userRepository ?? FirestoreUserRepository(),
+        _songRepository = songRepository ?? FirestoreSongRepository() {
+    _authService.user.listen(_onAuthStateChanged);
+  }
 
   // Optional reference to PlayerProvider for listening history wiring
   PlayerProvider? _playerProvider;
@@ -36,12 +45,9 @@ class UserProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isEmailVerified => _user?.emailVerified ?? false;
   bool get isPremium => _profile['premium'] ?? false;
-  bool get isAdmin => _profile['isAdmin'] == true || _user?.email?.toLowerCase() == 'prajapatiherry.28@gmail.com';
+  bool get isAdmin => _profile['isAdmin'] == true;
 
-  // Constructor
-  UserProvider() {
-    _authService.user.listen(_onAuthStateChanged);
-  }
+  // Constructor handled above
 
   // ============= AUTHENTICATION =============
 
@@ -155,7 +161,10 @@ class UserProvider extends ChangeNotifier {
   Future<void> _loadUserProfile() async {
     if (_user != null) {
       try {
-        _profile = await _firebaseService.getUserProfile(_user!.uid);
+        final profileData = await _userRepository.getUserProfile(_user!.uid);
+        if (profileData != null) {
+          _profile = profileData;
+        }
         await loadLikedSongs();
         await loadRecentlyPlayed();
         notifyListeners();
@@ -168,12 +177,11 @@ class UserProvider extends ChangeNotifier {
   Future<bool> updateProfile(Map<String, dynamic> data) async {
     _setLoading(true);
     try {
-      if (_user != null) {
         // Optimistic update
         _profile.addAll(data);
         notifyListeners();
         
-        await _firebaseService.updateUserProfile(_user!.uid, data);
+        await _userRepository.updateUserProfile(_user!.uid, data);
         return true;
       }
       return false;
@@ -266,16 +274,16 @@ class UserProvider extends ChangeNotifier {
   Future<void> loadLikedSongs() async {
     if (_user != null) {
       try {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_user!.uid)
-            .collection('likedSongs')
-            .get();
+        final likedIds = await _userRepository.getLikedSongIds(_user!.uid);
 
         _likedSongs = [];
-        for (final doc in snapshot.docs) {
-          final song = await _firebaseService.getSong(doc.id);
-          _likedSongs.add(song);
+        for (final id in likedIds) {
+          try {
+            final song = await _songRepository.getSongById(id);
+            _likedSongs.add(song);
+          } catch (e) {
+            AppLogger.warning('Could not load liked song $id: $e');
+          }
         }
         notifyListeners();
       } catch (e) {
@@ -288,8 +296,10 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return false;
 
     try {
-      await _firebaseService.likeSong(song.id, _user!.uid);
-      _likedSongs.add(song);
+      await _userRepository.toggleLikedSong(_user!.uid, song.id);
+      if (!isSongLiked(song.id)) {
+        _likedSongs.add(song);
+      }
       notifyListeners();
       return true;
     } catch (e) {
@@ -302,7 +312,7 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return false;
 
     try {
-      await _firebaseService.unlikeSong(songId, _user!.uid);
+      await _userRepository.toggleLikedSong(_user!.uid, songId);
       _likedSongs.removeWhere((s) => s.id == songId);
       notifyListeners();
       return true;
@@ -321,7 +331,18 @@ class UserProvider extends ChangeNotifier {
   Future<void> loadRecentlyPlayed() async {
     if (_user != null) {
       try {
-        _recentlyPlayed = await _firebaseService.getRecentlyPlayed(_user!.uid);
+        final history = await _userRepository.getRecentlyPlayed(_user!.uid);
+        _recentlyPlayed = [];
+        for (final item in history) {
+          try {
+            final song = await _songRepository.getSongById(item['songId']);
+            if (!_recentlyPlayed.any((s) => s.id == song.id)) {
+              _recentlyPlayed.add(song);
+            }
+          } catch (e) {
+            AppLogger.warning('Could not load recent song: $e');
+          }
+        }
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading recently played: $e');
@@ -335,7 +356,7 @@ class UserProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       // Implement payment integration
-      await _firebaseService.updateUserProfile(_user!.uid, {
+      await _userRepository.updateUserProfile(_user!.uid, {
         'premium': true,
         'premiumSince': DateTime.now().toIso8601String(),
       });
@@ -353,7 +374,7 @@ class UserProvider extends ChangeNotifier {
   Future<bool> cancelPremium() async {
     _setLoading(true);
     try {
-      await _firebaseService.updateUserProfile(_user!.uid, {
+      await _userRepository.updateUserProfile(_user!.uid, {
         'premium': false,
       });
       _profile['premium'] = false;
@@ -391,11 +412,8 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> logListeningEvent(Song song, int duration) async {
     if (_user != null) {
-      await _firebaseService.logListeningEvent(
-        userId: _user!.uid,
-        songId: song.id,
-        duration: duration,
-      );
+      await _userRepository.logListeningEvent(_user!.uid, song.id, duration);
+      await _userRepository.addToRecentlyPlayed(_user!.uid, song.id);
     }
   }
 
@@ -404,7 +422,7 @@ class UserProvider extends ChangeNotifier {
   Future<void> updatePreferences(Map<String, dynamic> preferences) async {
     if (_user != null) {
       try {
-        await _firebaseService.updateUserProfile(_user!.uid, {
+        await _userRepository.updateUserProfile(_user!.uid, {
           'preferences': preferences,
         });
         _profile['preferences'] = preferences;

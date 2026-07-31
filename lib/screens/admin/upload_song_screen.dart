@@ -146,7 +146,7 @@ class _UploadSongScreenState extends State<UploadSongScreen>
 
     final userProvider = context.read<UserProvider>();
     final uploadProvider = context.read<SongUploadProvider>();
-    final musicProvider = context.read<MusicProvider>();
+    final homeProvider = context.read<HomeProvider>();
 
     if (!userProvider.isAdmin) {
       _showSnack('Admin access required.', isError: true);
@@ -192,11 +192,11 @@ class _UploadSongScreenState extends State<UploadSongScreen>
       coverFileName: _useFileUpload ? _coverFileName : null,
     );
 
-    if (song != null) {
+    if (uploadedSong != null) {
       // Push to user-facing screens immediately
-      musicProvider.addSong(song);
+      homeProvider.addSong(uploadedSong);
       if (mounted) {
-        _showSnack('🎵 "${song.title}" uploaded successfully!');
+        _showSnack('🎵 "${uploadedSong.title}" uploaded successfully!');
         await Future.delayed(const Duration(milliseconds: 800));
         if (mounted) Navigator.pop(context, true);
       }

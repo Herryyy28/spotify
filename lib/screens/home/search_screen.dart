@@ -10,6 +10,7 @@ import '../../models/playlist_model.dart';
 import '../../widgets/song_tile.dart';
 import '../../core/theme/colors.dart';
 import '../player/player_screen.dart';
+import '../../providers/search_provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -20,83 +21,13 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final FirebaseService _firebaseService = FirebaseService();
-  final SaavnMusicService _saavnService = SaavnMusicService();
-
-  List<Song> _songResults = [];
-  List<Artist> _artistResults = [];
-  List<Playlist> _playlistResults = [];
-
-  bool _isSearching = false;
-  bool _isLoading = false;
-  String _selectedFilter = 'All';
-
   final List<String> _filters = ['All', 'Songs', 'Artists', 'Playlists'];
-
-  List<String> _recentSearches = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadRecentSearches();
-  }
-
-  Future<void> _loadRecentSearches() async {
-    // Load from shared preferences
-    setState(() {
-      _recentSearches = [
-        'Imagine Dragons',
-        'Ed Sheeran',
-        'Pop Hits',
-        'Workout'
-      ];
-    });
-  }
-
-  Future<void> _performSearch(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _songResults = [];
-        _artistResults = [];
-        _playlistResults = [];
-        _isSearching = false;
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _isSearching = true;
-    });
-
-    try {
-      final results = await Future.wait([
-        _firebaseService.searchSongs(query),
-        _saavnService.searchSongs(query, limit: 20),
-      ]);
-
-      final firebaseSongs = results[0];
-      final onlineSongs = results[1];
-
-      // Combine unique songs by ID
-      final Map<String, Song> uniqueResults = {};
-      for (var song in [...firebaseSongs, ...onlineSongs]) {
-        uniqueResults[song.id] = song;
-      }
-
-      setState(() {
-        _songResults = uniqueResults.values.toList();
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final searchProvider = Provider.of<SearchProvider>(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -159,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       child: TextField(
                         controller: _searchController,
-                        onChanged: _performSearch,
+                        onChanged: searchProvider.performSearch,
                         autofocus: true,
                         style: TextStyle(
                           fontSize: 16,
@@ -191,7 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                   onPressed: () {
                                     _searchController.clear();
-                                    _performSearch('');
+                                    searchProvider.performSearch('');
                                   },
                                 )
                               : null,
@@ -204,7 +135,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ),
-                  if (_isSearching) ...[
+                  if (searchProvider.isSearching) ...[
                     const SizedBox(width: 12),
                     Container(
                       decoration: BoxDecoration(
@@ -214,7 +145,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: TextButton(
                         onPressed: () {
                           _searchController.clear();
-                          _performSearch('');
+                          searchProvider.performSearch('');
                         },
                         child: const Text(
                           'Cancel',
@@ -231,7 +162,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
 
             // Filter Chips
-            if (_isSearching)
+            if (searchProvider.isSearching)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -239,14 +170,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: _filters.map((filter) {
-                      final isSelected = _selectedFilter == filter;
+                      final isSelected = searchProvider.selectedFilter == filter;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
                           label: Text(filter),
                           selected: isSelected,
                           onSelected: (_) {
-                            setState(() => _selectedFilter = filter);
+                            searchProvider.setFilter(filter);
                           },
                           backgroundColor: theme.cardColor,
                           selectedColor: AppColors.primary.withValues(alpha: 0.2),
@@ -264,7 +195,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
             // Search Results
             Expanded(
-              child: _buildSearchResults(),
+              child: _buildSearchResults(searchProvider),
             ),
           ],
         ),
@@ -272,18 +203,16 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildSearchResults() {
-    if (!_isSearching) {
-      return _buildRecentSearches();
+  Widget _buildSearchResults(SearchProvider searchProvider) {
+    if (!searchProvider.isSearching) {
+      return _buildRecentSearches(searchProvider);
     }
 
-    if (_isLoading) {
+    if (searchProvider.isLoading) {
       return _buildShimmerLoading();
     }
 
-    if (_songResults.isEmpty &&
-        _artistResults.isEmpty &&
-        _playlistResults.isEmpty) {
+    if (searchProvider.songResults.isEmpty && searchProvider.artistResults.isEmpty && searchProvider.playlistResults.isEmpty) {
       return _buildEmptyState();
     }
 
@@ -291,7 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         // Top Result
-        if (_selectedFilter == 'All' && _songResults.isNotEmpty) ...[
+        if (searchProvider.selectedFilter == 'All' && searchProvider.songResults.isNotEmpty) ...[
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Text(
@@ -302,13 +231,13 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
-          _buildTopResult(_songResults.first),
+          _buildTopResult(searchProvider.songResults.first),
           const SizedBox(height: 24),
         ],
 
         // Songs
-        if (_selectedFilter == 'All' || _selectedFilter == 'Songs')
-          if (_songResults.isNotEmpty) ...[
+        if (searchProvider.selectedFilter == 'All' || searchProvider.selectedFilter == 'Songs')
+          if (searchProvider.songResults.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
@@ -319,16 +248,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             ),
-            ..._songResults.take(5).map((song) => SongTile(
+            ...searchProvider.songResults.take(5).map((song) => SongTile(
                   song: song,
                   onTap: () => _playSong(song),
                 )),
-            if (_songResults.length > 5)
+            if (searchProvider.songResults.length > 5)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: TextButton(
                   onPressed: () {
-                    setState(() => _selectedFilter = 'Songs');
+                    searchProvider.setFilter('Songs');
                   },
                   child: const Text('See All Songs'),
                 ),
@@ -337,8 +266,8 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
 
         // Artists
-        if (_selectedFilter == 'All' || _selectedFilter == 'Artists')
-          if (_artistResults.isNotEmpty) ...[
+        if (searchProvider.selectedFilter == 'All' || searchProvider.selectedFilter == 'Artists')
+          if (searchProvider.artistResults.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
@@ -353,9 +282,9 @@ class _SearchScreenState extends State<SearchScreen> {
               height: 160,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: _artistResults.length,
+                itemCount: searchProvider.artistResults.length,
                 itemBuilder: (context, index) {
-                  final artist = _artistResults[index];
+                  final artist = searchProvider.artistResults[index];
                   return _buildArtistCard(artist);
                 },
               ),
@@ -364,8 +293,8 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
 
         // Playlists
-        if (_selectedFilter == 'All' || _selectedFilter == 'Playlists')
-          if (_playlistResults.isNotEmpty) ...[
+        if (searchProvider.selectedFilter == 'All' || searchProvider.selectedFilter == 'Playlists')
+          if (searchProvider.playlistResults.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
@@ -376,14 +305,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             ),
-            ..._playlistResults.map((playlist) => _buildPlaylistTile(playlist)),
+            ...searchProvider.playlistResults.map((playlist) => _buildPlaylistTile(playlist)),
           ],
       ],
     );
   }
 
-  Widget _buildRecentSearches() {
+  Widget _buildRecentSearches(SearchProvider searchProvider) {
     final theme = Theme.of(context);
+
+    if (searchProvider.recentSearches.isEmpty) {
+      return const Center(child: Text("No recent searches"));
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +333,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               TextButton(
-                onPressed: _clearRecentSearches,
+                onPressed: () => searchProvider.clearRecentSearches(),
                 child: const Text('Clear All'),
               ),
             ],
@@ -409,19 +342,19 @@ class _SearchScreenState extends State<SearchScreen> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _recentSearches.length,
+            itemCount: searchProvider.recentSearches.length,
             itemBuilder: (context, index) {
-              final search = _recentSearches[index];
+              final search = searchProvider.recentSearches[index];
               return ListTile(
                 leading: const Icon(Icons.history, color: Colors.grey),
                 title: Text(search),
                 trailing: IconButton(
                   icon: const Icon(Icons.close, size: 20),
-                  onPressed: () => _removeRecentSearch(search),
+                  onPressed: () => searchProvider.removeRecentSearch(search),
                 ),
                 onTap: () {
                   _searchController.text = search;
-                  _performSearch(search);
+                  searchProvider.performSearch(search);
                 },
               );
             },
@@ -596,17 +529,9 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _clearRecentSearches() {
-    setState(() {
-      _recentSearches.clear();
-    });
-  }
+  // _clearRecentSearches is now in provider
 
-  void _removeRecentSearch(String search) {
-    setState(() {
-      _recentSearches.remove(search);
-    });
-  }
+  // _removeRecentSearch is now in provider
 
   @override
   void dispose() {

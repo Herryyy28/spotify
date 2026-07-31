@@ -480,19 +480,10 @@ class _LoginScreenState extends State<LoginScreen>
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
-      bool success = await userProvider.signInWithEmail(
+      final success = await userProvider.signInWithEmail(
         email,
         password,
       );
-
-      // Auto-create admin account if it doesn't exist yet
-      if (!success && email.toLowerCase() == 'prajapatiherry.28@gmail.com') {
-        success = await userProvider.signUpWithEmail(
-          email: email,
-          password: password,
-          name: 'Admin',
-        );
-      }
 
       if (success && mounted) {
         // If we're on a pushed route, pop to return to the root
@@ -503,36 +494,32 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  Future<void> _handleGoogleSignIn(UserProvider userProvider) async {
-    final success = await userProvider.signInWithGoogle();
-    if (success && mounted) {
-      if (Navigator.canPop(context)) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-      }
-    } else if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(userProvider.error ?? 'Google sign in failed'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
+  void _handleGoogleSignIn(UserProvider userProvider) {
+    // Google Sign-In requires platform-specific configuration (SHA fingerprint on Android).
+    // This will be enabled in a future release.
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Google Sign-In coming soon!'),
+        backgroundColor: AppColors.neonBlue,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
-  Future<void> _handleAppleSignIn(UserProvider userProvider) async {
-    final success = await userProvider.signInWithApple();
-    if (success && mounted) {
-      if (Navigator.canPop(context)) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-      }
-    } else if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(userProvider.error ?? 'Apple sign in failed'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
+  void _handleAppleSignIn(UserProvider userProvider) {
+    // Apple Sign-In requires an Apple Developer account with Sign In with Apple capability.
+    // This will be enabled in a future release.
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Apple Sign-In coming soon!'),
+        backgroundColor: AppColors.neonPurple,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   Future<void> _handleGuestSignIn(UserProvider userProvider) async {

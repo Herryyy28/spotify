@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harmony_music/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
 import '../providers/player_provider.dart';
@@ -54,7 +55,8 @@ class MiniPlayer extends StatelessWidget {
                             boxShadow: [
                               if (playerProvider.isPlaying)
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.5),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.5),
                                   blurRadius: 12,
                                   spreadRadius: 1,
                                 ),
@@ -95,9 +97,12 @@ class MiniPlayer extends StatelessWidget {
                             children: [
                               Text(
                                 currentSong.title,
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -110,9 +115,12 @@ class MiniPlayer extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Text(
                                     currentSong.artist,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: Colors.grey[600],
+                                        ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),

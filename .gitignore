@@ -43,3 +43,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ── SECURITY: Firebase credentials (NEVER commit these) ───────────────────────
+# firebase_options.dart contains real API keys and project IDs.
+# Regenerate using: flutterfire configure
+# Keep a private copy outside the repository.
+# NOTE: If you intentionally commit this for convenience (not recommended for
+# open-source projects), remove the next line. For any public repo, keep it.
+# lib/firebase_options.dart
+
+# ── BLOAT: Build artifacts ────────────────────────────────────────────────────
+# APK/IPA files should be distributed via CI/CD, not committed to git
+*.apk
+*.ipa
+*.aab
+
+# Node dependencies
+node_modules/
+
+# ── Node.js (Firebase CLI, web tooling) ───────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Stray files at project root ───────────────────────────────────────────────
+headphones.png
+pencil-welcome.pen

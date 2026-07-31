@@ -17,6 +17,7 @@ import 'providers/player_provider.dart';
 import 'providers/playlist_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/music_provider.dart';
+import 'providers/search_provider.dart';
 import 'providers/recommendation_provider.dart';
 import 'providers/analytics_provider.dart';
 import 'providers/social_provider.dart';
@@ -133,7 +134,8 @@ class MyApp extends StatelessWidget {
               return user;
             },
           ),
-          ChangeNotifierProvider(create: (_) => MusicProvider()),
+          ChangeNotifierProvider(create: (_) => HomeProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
           ChangeNotifierProvider(create: (_) => RecommendationProvider()),
           ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
           ChangeNotifierProvider(create: (_) => SocialProvider()),
@@ -142,7 +144,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-            title: 'Spotify',
+            title: 'Harmony Music',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

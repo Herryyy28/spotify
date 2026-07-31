@@ -173,29 +173,48 @@ class Song {
   }
 
   factory Song.fromJson(Map<String, dynamic> json) {
+    DateTime parsedReleaseDate;
+    if (json['releaseDate'] == null) {
+      parsedReleaseDate = DateTime.now();
+    } else if (json['releaseDate'] is String) {
+      parsedReleaseDate = DateTime.tryParse(json['releaseDate']) ?? DateTime.now();
+    } else if (json['releaseDate'] is int) {
+      parsedReleaseDate = DateTime.fromMillisecondsSinceEpoch(json['releaseDate']);
+    } else {
+      try {
+        parsedReleaseDate = (json['releaseDate'] as dynamic).toDate();
+      } catch (_) {
+        parsedReleaseDate = DateTime.now();
+      }
+    }
+
     return Song(
-      id: json['id'],
-      title: json['title'],
-      artist: json['artist'],
-      album: json['album'],
-      duration: json['duration'],
-      durationInSeconds: json['durationInSeconds'],
-      audioUrl: json['audioUrl'],
-      coverUrl: json['coverUrl'],
-      artistId: json['artistId'],
-      albumId: json['albumId'],
-      genres: List<String>.from(json['genres'] ?? []),
-      releaseDate: DateTime.parse(json['releaseDate']),
-      playCount: json['playCount'] ?? 0,
-      likeCount: json['likeCount'] ?? 0,
-      isExplicit: json['isExplicit'] ?? false,
-      lyricsUrl: json['lyricsUrl'],
-      copyright: json['copyright'],
-      tags: List<String>.from(json['tags'] ?? []),
-      bitrate: json['bitrate'] ?? 320,
-      format: json['format'] ?? 'mp3',
-      uploadedByAdminId: json['uploadedByAdminId'],
-      uploadedAt: json['uploadedAt'] != null ? DateTime.tryParse(json['uploadedAt']) : null,
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? 'Unknown Title',
+      artist: json['artist']?.toString() ?? 'Unknown Artist',
+      album: json['album']?.toString() ?? 'Single',
+      duration: json['duration']?.toString() ?? '0:00',
+      durationInSeconds: (json['durationInSeconds'] as num?)?.toInt() ?? 0,
+      audioUrl: json['audioUrl']?.toString() ?? '',
+      coverUrl: json['coverUrl']?.toString() ?? '',
+      artistId: json['artistId']?.toString(),
+      albumId: json['albumId']?.toString(),
+      genres: json['genres'] != null ? List<String>.from(json['genres']) : [],
+      releaseDate: parsedReleaseDate,
+      playCount: (json['playCount'] as num?)?.toInt() ?? 0,
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      isExplicit: json['isExplicit'] == true,
+      lyricsUrl: json['lyricsUrl']?.toString(),
+      copyright: json['copyright']?.toString(),
+      tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
+      bitrate: (json['bitrate'] as num?)?.toInt() ?? 320,
+      format: json['format']?.toString() ?? 'mp3',
+      uploadedByAdminId: json['uploadedByAdminId']?.toString(),
+      uploadedAt: json['uploadedAt'] != null 
+          ? (json['uploadedAt'] is String 
+              ? DateTime.tryParse(json['uploadedAt']) 
+              : null) 
+          : null,
     );
   }
 

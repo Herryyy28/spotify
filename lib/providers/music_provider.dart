@@ -3,12 +3,16 @@ import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
 import '../models/playlist_model.dart';
-import '../services/firebase_service.dart';
+import '../data/repositories/song_repository.dart';
+import '../data/repositories/firestore_song_repository.dart';
 import '../services/saavn_music_service.dart';
 
-class MusicProvider extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+class HomeProvider extends ChangeNotifier {
+  final SongRepository _songRepository;
   final SaavnMusicService _saavnMusicService = SaavnMusicService();
+
+  HomeProvider({SongRepository? songRepository})
+      : _songRepository = songRepository ?? FirestoreSongRepository();
 
   List<Song> _featuredSongs = [];
   final List<Song> _recentSongs = [];
@@ -38,27 +42,27 @@ class MusicProvider extends ChangeNotifier {
   Future<void> loadInitialData() async {
     _setLoading(true);
     try {
-      // Listen to real-time updates from Firestore collection 'songs'
+      // Subscribe to real-time updates — newly uploaded songs appear instantly
       _songsSubscription?.cancel();
-      _songsSubscription = _firebaseService.getSongsStream().listen((firebaseSongs) {
-        if (firebaseSongs.isNotEmpty) {
-          _featuredSongs = _mergeSongs(firebaseSongs, _featuredSongs).take(10).toList();
-          _popularSongs = _mergeSongs(firebaseSongs, _popularSongs).take(15).toList();
-          _newHits = _mergeSongs(firebaseSongs, _newHits);
+      _songsSubscription = _songRepository.watchSongs(limit: 100).listen(
+        (firebaseSongs) {
+          if (firebaseSongs.isNotEmpty) {
+            _featuredSongs = _mergeSongs(firebaseSongs, _featuredSongs).take(10).toList();
+            _popularSongs = _mergeSongs(firebaseSongs, _popularSongs).take(15).toList();
+            _newHits = _mergeSongs(firebaseSongs, _newHits);
+            _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
+            _error = null;
+            notifyListeners();
+          }
+        },
+        onError: (e) => AppLogger.error('Song stream error: $e'),
+      );
 
-          _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
-          _error = null;
-          notifyListeners();
-        }
-      }, onError: (e) {
-        AppLogger.error('Real-time Firestore song stream error: $e');
-      });
-
-      // Fetch initial batch
+      // Fetch initial snapshot in parallel (faster than waiting for stream)
       final results = await Future.wait([
-        _firebaseService.getSongs(limit: 10),
-        _firebaseService.getPopularSongs(limit: 10),
-        _firebaseService.getSongs(limit: 10),
+        _songRepository.getSongs(limit: 10),
+        _songRepository.getPopularSongs(limit: 10),
+        _songRepository.getSongs(limit: 10),
       ]);
 
       _featuredSongs = _mergeSongs(results[0], _featuredSongs);
@@ -264,56 +268,41 @@ class MusicProvider extends ChangeNotifier {
     return uniqueSongs.values.toList();
   }
 
-  /// Adds a new song and immediately notifies user-side listeners.
-  Future<void> addSong(Song song) async {
+  /// Adds a song to the local in-memory state and notifies listeners.
+  /// Callers are responsible for persisting the song to Firebase before calling this.
+  void addSong(Song song) {
+    // Avoid duplicates if the stream listener fires shortly after
+    if (_featuredSongs.any((s) => s.id == song.id) ||
+        _newHits.any((s) => s.id == song.id)) {
+      return;
+    }
     _newHits.insert(0, song);
     _featuredSongs.insert(0, song);
     notifyListeners();
-
-    try {
-      await _firebaseService.addSong(song);
-    } catch (e) {
-      AppLogger.error('Error persisting added song to Firebase: $e');
-    }
   }
 
-  /// Updates an existing song and immediately notifies user-side listeners.
-  Future<void> updateSong(Song updatedSong) async {
+  /// Updates a song in local in-memory state and notifies listeners.
+  /// Callers are responsible for persisting the update to Firebase.
+  void updateSong(Song updatedSong) {
     void updateInList(List<Song> list) {
       final index = list.indexWhere((s) => s.id == updatedSong.id);
-      if (index != -1) {
-        list[index] = updatedSong;
-      }
+      if (index != -1) list[index] = updatedSong;
     }
-
     updateInList(_featuredSongs);
     updateInList(_popularSongs);
     updateInList(_newHits);
     updateInList(_recentSongs);
-
     notifyListeners();
-
-    try {
-      await _firebaseService.updateSong(updatedSong);
-    } catch (e) {
-      AppLogger.error('Error updating song in Firebase: $e');
-    }
   }
 
-  /// Deletes a song by ID and immediately notifies user-side listeners.
-  Future<void> deleteSong(String songId) async {
+  /// Deletes a song from local in-memory state and notifies listeners.
+  /// Callers are responsible for deleting from Firebase.
+  void deleteSong(String songId) {
     _featuredSongs.removeWhere((s) => s.id == songId);
     _popularSongs.removeWhere((s) => s.id == songId);
     _newHits.removeWhere((s) => s.id == songId);
     _recentSongs.removeWhere((s) => s.id == songId);
-
     notifyListeners();
-
-    try {
-      await _firebaseService.deleteSong(songId);
-    } catch (e) {
-      AppLogger.error('Error deleting song from Firebase: $e');
-    }
   }
 
   /// Replaces the current song lists with a new collection of songs.

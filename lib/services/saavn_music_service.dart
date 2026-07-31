@@ -1,20 +1,21 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '../models/song_model.dart';
 import '../core/utils/logger.dart';
 
 class SaavnMusicService {
   static const String _baseUrl = 'https://saavn.dev/api';
+  final Dio _dio = Dio();
 
   /// Searches songs on JioSaavn and maps them to [Song] models with full 320kbps audio URLs.
   Future<List<Song>> searchSongs(String query, {int limit = 20}) async {
     try {
       final encodedQuery = Uri.encodeComponent(query);
-      final url = Uri.parse('$_baseUrl/search/songs?query=$encodedQuery&limit=$limit');
-      final response = await http.get(url);
+      final url = '$_baseUrl/search/songs?query=$encodedQuery&limit=$limit';
+      final response = await _dio.get(url);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final Map<String, dynamic> data = response.data is String ? json.decode(response.data) : response.data;
         final List<dynamic> results = data['data']?['results'] ?? [];
 
         return results.map((item) => _mapToSong(item)).where((song) => song.audioUrl.isNotEmpty).toList();
@@ -33,10 +34,10 @@ class SaavnMusicService {
   /// Fetches lyrics for a song by ID if available.
   Future<String?> fetchLyrics(String songId) async {
     try {
-      final url = Uri.parse('$_baseUrl/songs/$songId/lyrics');
-      final response = await http.get(url);
+      final url = '$_baseUrl/songs/$songId/lyrics';
+      final response = await _dio.get(url);
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final Map<String, dynamic> data = response.data is String ? json.decode(response.data) : response.data;
         return data['data']?['lyrics'];
       }
     } catch (e) {

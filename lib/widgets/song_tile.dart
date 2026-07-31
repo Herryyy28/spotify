@@ -61,15 +61,16 @@ class SongTile extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onTap ?? () {
-              playerProvider.playSong(song);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PlayerScreen(song: song),
-                ),
-              );
-            },
+            onTap: onTap ??
+                () {
+                  playerProvider.playSong(song);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PlayerScreen(song: song),
+                    ),
+                  );
+                },
             borderRadius: BorderRadius.circular(20),
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -179,7 +180,8 @@ class SongTile extends StatelessWidget {
                         icon: const Icon(Icons.more_vert_rounded),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: onMenuTap ?? () => _showSongMenu(context, song),
+                        onPressed:
+                            onMenuTap ?? () => _showSongMenu(context, song),
                       ),
                       const SizedBox(width: 4),
                       IconButton(
@@ -238,8 +240,10 @@ class SongTile extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.playlist_add_rounded, color: AppColors.primary),
-              title: const Text('Add to Playlist', style: TextStyle(fontWeight: FontWeight.bold)),
+              leading: const Icon(Icons.playlist_add_rounded,
+                  color: AppColors.primary),
+              title: const Text('Add to Playlist',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: const Text('Save this track to one of your playlists'),
               onTap: () {
                 Navigator.pop(context);
