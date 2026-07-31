@@ -14,13 +14,11 @@ import '../../providers/user_provider.dart';
 import '../../data/repositories/firestore_song_repository.dart';
 import '../../data/repositories/song_repository.dart';
 import '../../services/firebase_service.dart'; // kept for storage uploads only
-import '../../services/saavn_music_service.dart';
 import '../../core/utils/logger.dart';
 import '../playlist/playlist_detail_screen.dart';
 import '../../widgets/admin/admin_dashboard_tab.dart';
 import '../../widgets/admin/admin_playlists_tab.dart';
 import '../../widgets/admin/admin_library_tab.dart';
-import '../../widgets/admin/admin_import_songs_tab.dart';
 import '../../widgets/admin/admin_add_song_tab.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -43,7 +41,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   final FirebaseService _firebaseService = FirebaseService();
   // All song CRUD goes through the repository abstraction
   final SongRepository _songRepository = FirestoreSongRepository();
-  final SaavnMusicService _saavnService = SaavnMusicService();
 
   int _selectedNavIndex = 0;
   bool _isLoadingAction = false;
@@ -61,10 +58,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   final _coverUrlController = TextEditingController();
   String? _editingSongId;
 
-  // Search import controller
-  final _searchImportController = TextEditingController();
-  List<Song> _searchResults = [];
-  bool _isSearching = false;
 
   // File upload state (web-compatible using bytes)
   Uint8List? _audioBytes;
@@ -107,7 +100,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     _durationController.dispose();
     _audioUrlController.dispose();
     _coverUrlController.dispose();
-    _searchImportController.dispose();
     super.dispose();
   }
 
@@ -251,10 +243,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           // Nav Items
           _buildNavItem(0, Icons.dashboard_rounded, 'Dashboard', isDark),
           _buildNavItem(1, Icons.add_circle_rounded, 'Add Song', isDark),
-          _buildNavItem(
-              2, Icons.cloud_download_rounded, 'Import Songs', isDark),
-          _buildNavItem(3, Icons.library_music_rounded, 'All Songs', isDark),
-          _buildNavItem(4, Icons.featured_play_list_rounded, 'Playlists', isDark),
+          _buildNavItem(2, Icons.library_music_rounded, 'All Songs', isDark),
+          _buildNavItem(3, Icons.featured_play_list_rounded, 'Playlists', isDark),
           const Spacer(),
           // Live indicator
           Padding(
@@ -383,12 +373,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               _buildBottomNavItem(
                   0, Icons.dashboard_rounded, 'Dashboard', isDark),
               _buildBottomNavItem(1, Icons.add_circle_rounded, 'Add', isDark),
-              _buildBottomNavItem(
-                  2, Icons.cloud_download_rounded, 'Import', isDark),
-              _buildBottomNavItem(
-                  3, Icons.library_music_rounded, 'Songs', isDark),
-              _buildBottomNavItem(
-                  4, Icons.featured_play_list_rounded, 'Playlists', isDark),
+              _buildBottomNavItem(2, Icons.library_music_rounded, 'Songs', isDark),
+              _buildBottomNavItem(3, Icons.featured_play_list_rounded, 'Playlists', isDark),
             ],
           ),
         ),
@@ -463,7 +449,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                 [
                   'Dashboard',
                   'Add Song',
-                  'Import Songs',
                   'All Songs',
                   'Playlists'
                 ][_selectedNavIndex],
@@ -552,7 +537,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         return AdminDashboardTab(
           isDark: isDark,
           onNavigate: (index) => setState(() => _selectedNavIndex = index),
-          onImportTrending: _importTrendingToFirebase,
           isLoadingAction: _isLoadingAction,
           buildSongTile: _buildSongTile,
         );
@@ -582,23 +566,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           parentContext: context,
         );
       case 2:
-        return AdminImportSongsTab(
-          isDark: isDark,
-          searchImportController: _searchImportController,
-          searchOnlineSongs: _searchOnlineSongs,
-          isSearching: _isSearching,
-          searchResults: _searchResults,
-          isLoadingAction: _isLoadingAction,
-          importAllSearchResults: _importAllSearchResults,
-          bulkImport: _bulkImport,
-          importSingleSong: _importSingleSong,
-        );
-      case 3:
         return AdminLibraryTab(
           isDark: isDark,
           buildSongTile: _buildSongTile,
         );
-      case 4:
+      case 3:
         return AdminPlaylistsTab(isDark: isDark);
       default:
         return const SizedBox.shrink();
@@ -890,7 +862,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
       if (_editingSongId != null) {
         try {
-          await _songRepository.updateSong(song).timeout(const Duration(seconds: 10));
+          await _songRepository.updateSong(song).timeout(const Duration(seconds: 30));
           // Update local state only after confirmed Firebase write
           musicProvider.updateSong(song);
           _setStatus('✅ Song "${song.title}" updated successfully! Live in your app.');
@@ -900,7 +872,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         }
       } else {
         try {
-          await _songRepository.addSong(song).timeout(const Duration(seconds: 10));
+          await _songRepository.addSong(song).timeout(const Duration(seconds: 30));
           // Update local state only after confirmed Firebase write
           musicProvider.addSong(song);
           _setStatus('🎉 "${song.title}" published! Instantly live on player and home screen.');
@@ -922,111 +894,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     }
   }
 
-  Future<void> _importTrendingToFirebase() async {
-    setState(() => _isLoadingAction = true);
-    _setStatus('Fetching trending songs...');
-    try {
-      final songs =
-          await _saavnService.fetchTrendingSongs(query: 'top hits', limit: 20);
-      if (songs.isEmpty) {
-        _setStatus('No songs found online', isSuccess: false);
-        return;
-      }
-
-      final musicProvider = Provider.of<HomeProvider>(context, listen: false);
-      int count = 0;
-      for (var song in songs) {
-        await _firebaseService.addSong(song);
-        musicProvider.addSong(song);
-        count++;
-      }
-
-      _setStatus(
-          '🎉 Published $count trending songs to Firebase Cloud! Live on all user apps.');
-    } catch (e) {
-      _setStatus('Error: $e', isSuccess: false);
-    } finally {
-      setState(() => _isLoadingAction = false);
-    }
-  }
-
-  Future<void> _bulkImport(String query, String label) async {
-    setState(() => _isLoadingAction = true);
-    _setStatus('Importing $label songs...');
-    try {
-      final songs = await _saavnService.searchSongs(query, limit: 20);
-      if (songs.isEmpty) {
-        _setStatus('No $label songs found', isSuccess: false);
-        return;
-      }
-
-      final musicProvider = Provider.of<HomeProvider>(context, listen: false);
-      int count = 0;
-      for (var song in songs) {
-        await _firebaseService.addSong(song);
-        musicProvider.addSong(song);
-        count++;
-      }
-
-      _setStatus('🎉 Published $count $label songs! Live on all user devices.');
-    } catch (e) {
-      _setStatus('Error importing $label: $e', isSuccess: false);
-    } finally {
-      setState(() => _isLoadingAction = false);
-    }
-  }
-
-  Future<void> _searchOnlineSongs() async {
-    final query = _searchImportController.text.trim();
-    if (query.isEmpty) return;
-
-    setState(() {
-      _isSearching = true;
-      _searchResults = [];
-    });
-    try {
-      final results = await _saavnService.searchSongs(query, limit: 20);
-      setState(() => _searchResults = results);
-      if (results.isEmpty) {
-        _setStatus('No results found for "$query"', isSuccess: false);
-      }
-    } catch (e) {
-      _setStatus('Search failed: $e', isSuccess: false);
-    } finally {
-      setState(() => _isSearching = false);
-    }
-  }
-
-  Future<void> _importAllSearchResults() async {
-    if (_searchResults.isEmpty) return;
-    setState(() => _isLoadingAction = true);
-    try {
-      final musicProvider = Provider.of<HomeProvider>(context, listen: false);
-      int count = 0;
-      for (var song in _searchResults) {
-        await _firebaseService.addSong(song);
-        musicProvider.addSong(song);
-        count++;
-      }
-      _setStatus('🎉 Published $count songs to Firebase Cloud!');
-      setState(() => _searchResults = []);
-    } catch (e) {
-      _setStatus('Error: $e', isSuccess: false);
-    } finally {
-      setState(() => _isLoadingAction = false);
-    }
-  }
-
-  Future<void> _importSingleSong(Song song) async {
-    try {
-      final musicProvider = Provider.of<HomeProvider>(context, listen: false);
-      await _firebaseService.addSong(song);
-      musicProvider.addSong(song);
-      _setStatus('✅ "${song.title}" published to Firebase!');
-    } catch (e) {
-      _setStatus('Error: $e', isSuccess: false);
-    }
-  }
 
   void _editSong(Song song) {
     setState(() {

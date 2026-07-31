@@ -114,45 +114,82 @@ class _LibraryScreenState extends State<LibraryScreen>
             ),
           ),
 
-          // Tabs
-          SliverPersistentHeader(
-            delegate: _SliverAppBarDelegate(
-              TabBar(
-                controller: _tabController,
-                labelColor: AppColors.primary,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: AppColors.primary,
-                tabs: const [
-                  Tab(text: 'Your Library'),
-                  Tab(text: 'Liked Songs'),
-                ],
+          // Tabs (Only if not anonymous)
+          if (!userProvider.isAnonymous)
+            SliverPersistentHeader(
+              delegate: _SliverAppBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: AppColors.primary,
+                  tabs: const [
+                    Tab(text: 'Your Library'),
+                    Tab(text: 'Liked Songs'),
+                  ],
+                ),
               ),
+              pinned: true,
             ),
-            pinned: true,
-          ),
 
           // Content
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverToBoxAdapter(
-              child: IndexedStack(
-                index: _tabController.index,
-                children: [
-                  _buildLibraryContent(playlistProvider, userProvider),
-                  _buildLikedSongs(userProvider),
-                ],
+          if (userProvider.isAnonymous)
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.library_music, size: 80, color: Colors.grey[400]),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Sign in to save music',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Create an account to save playlists and favorites.',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await userProvider.signOut();
+                        if (context.mounted) {
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      ),
+                      child: const Text('Log In / Sign Up'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverToBoxAdapter(
+                child: IndexedStack(
+                  index: _tabController.index,
+                  children: [
+                    _buildLibraryContent(playlistProvider, userProvider),
+                    _buildLikedSongs(userProvider),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
-      floatingActionButton: _tabController.index == 0
+      floatingActionButton: (!userProvider.isAnonymous && _tabController.index == 0)
           ? FloatingActionButton.extended(
-        onPressed: () => _showCreatePlaylistDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Create Playlist'),
-        backgroundColor: AppColors.primary,
-      )
+              onPressed: () => _showCreatePlaylistDialog(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Create Playlist'),
+              backgroundColor: AppColors.primary,
+            )
           : null,
     );
   }

@@ -510,18 +510,20 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  void _handleAppleSignIn(UserProvider userProvider) {
-    // Apple Sign-In requires an Apple Developer account with Sign In with Apple capability.
-    // This will be enabled in a future release.
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Apple Sign-In coming soon!'),
-        backgroundColor: AppColors.neonPurple,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+  Future<void> _handleAppleSignIn(UserProvider userProvider) async {
+    final success = await userProvider.signInWithApple();
+    if (success && mounted) {
+      if (Navigator.canPop(context)) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } else if (!success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.error ?? 'Apple sign in failed'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _handleGuestSignIn(UserProvider userProvider) async {

@@ -5,11 +5,9 @@ import '../models/song_model.dart';
 import '../models/playlist_model.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
-import '../services/saavn_music_service.dart';
 
 class HomeProvider extends ChangeNotifier {
   final SongRepository _songRepository;
-  final SaavnMusicService _saavnMusicService = SaavnMusicService();
 
   HomeProvider({SongRepository? songRepository})
       : _songRepository = songRepository ?? FirestoreSongRepository();
@@ -47,10 +45,13 @@ class HomeProvider extends ChangeNotifier {
       _songsSubscription = _songRepository.watchSongs(limit: 100).listen(
         (firebaseSongs) {
           if (firebaseSongs.isNotEmpty) {
-            _featuredSongs = _mergeSongs(firebaseSongs, _featuredSongs).take(10).toList();
-            _popularSongs = _mergeSongs(firebaseSongs, _popularSongs).take(15).toList();
+            _featuredSongs =
+                _mergeSongs(firebaseSongs, _featuredSongs).take(10).toList();
+            _popularSongs =
+                _mergeSongs(firebaseSongs, _popularSongs).take(15).toList();
             _newHits = _mergeSongs(firebaseSongs, _newHits);
-            _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
+            _buildPlaylistsFromSongs(
+                [..._featuredSongs, ..._popularSongs, ..._newHits]);
             _error = null;
             notifyListeners();
           }
@@ -69,11 +70,12 @@ class HomeProvider extends ChangeNotifier {
       _popularSongs = _mergeSongs(results[1], _popularSongs);
       _newHits = _mergeSongs(results[2], _newHits);
 
-      // If Firebase is empty, populate all sections dynamically from Saavn API!
+      // If Firebase is empty, populate with initial demo songs
       if (_featuredSongs.isEmpty && _popularSongs.isEmpty && _newHits.isEmpty) {
         await _loadWebFallbackSongs();
       } else {
-        _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
+        _buildPlaylistsFromSongs(
+            [..._featuredSongs, ..._popularSongs, ..._newHits]);
       }
 
       _error = null;
@@ -100,69 +102,56 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> _loadWebFallbackSongs() async {
-    try {
-      final results = await Future.wait([
-        _saavnMusicService.fetchTrendingSongs(query: 'top hits', limit: 12),
-        _saavnMusicService.fetchTrendingSongs(query: 'trending', limit: 12),
-        _saavnMusicService.fetchTrendingSongs(query: 'new hits', limit: 12),
-      ]);
+    final mockOfflineSongs = [
+      Song(
+        id: 'offline_1',
+        title: 'Sunset Lofi Horizon',
+        artist: 'Ambient Soundscape',
+        album: 'Cozy Afternoons',
+        duration: '3:02',
+        durationInSeconds: 182,
+        audioUrl:
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        coverUrl:
+            'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=500&q=80',
+        releaseDate: DateTime.now(),
+      ),
+      Song(
+        id: 'offline_2',
+        title: 'Neon Midnight Cruise',
+        artist: 'Retro Horizon',
+        album: 'Outrun Drive',
+        duration: '4:15',
+        durationInSeconds: 255,
+        audioUrl:
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        coverUrl:
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80',
+        releaseDate: DateTime.now(),
+      ),
+      Song(
+        id: 'offline_3',
+        title: 'Raindrops & Cafe Ambient',
+        artist: 'Acoustic Solitude',
+        album: 'Coffee Shop Study',
+        duration: '2:50',
+        durationInSeconds: 170,
+        audioUrl:
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        coverUrl:
+            'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500&q=80',
+        releaseDate: DateTime.now(),
+      ),
+    ];
 
-      _featuredSongs = _mergeSongs(_featuredSongs, results[0]);
-      _popularSongs = _mergeSongs(_popularSongs, results[1]);
-      _newHits = _mergeSongs(_newHits, results[2]);
+    _featuredSongs = _mergeSongs(_featuredSongs, mockOfflineSongs);
+    _popularSongs = _mergeSongs(_popularSongs, mockOfflineSongs);
+    _newHits = _mergeSongs(_newHits, mockOfflineSongs);
 
-      final allFetchedSongs = [..._featuredSongs, ..._popularSongs, ..._newHits];
-      _buildPlaylistsFromSongs(allFetchedSongs);
-
-      _error = null;
-      notifyListeners();
-    } catch (e) {
-      AppLogger.warning('Saavn API fetch failed (likely offline). Loading local mock songs for offline preview: $e');
-      
-      final mockOfflineSongs = [
-        Song(
-          id: 'offline_1',
-          title: 'Sunset Lofi Horizon',
-          artist: 'Ambient Soundscape',
-          album: 'Cozy Afternoons',
-          duration: '3:02',
-          durationInSeconds: 182,
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-          coverUrl: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=500&q=80',
-          releaseDate: DateTime.now(),
-        ),
-        Song(
-          id: 'offline_2',
-          title: 'Neon Midnight Cruise',
-          artist: 'Retro Horizon',
-          album: 'Outrun Drive',
-          duration: '4:15',
-          durationInSeconds: 255,
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-          coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80',
-          releaseDate: DateTime.now(),
-        ),
-        Song(
-          id: 'offline_3',
-          title: 'Raindrops & Cafe Ambient',
-          artist: 'Acoustic Solitude',
-          album: 'Coffee Shop Study',
-          duration: '2:50',
-          durationInSeconds: 170,
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-          coverUrl: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500&q=80',
-          releaseDate: DateTime.now(),
-        ),
-      ];
-
-      _featuredSongs = _mergeSongs(_featuredSongs, mockOfflineSongs);
-      _popularSongs = _mergeSongs(_popularSongs, mockOfflineSongs);
-      _newHits = _mergeSongs(_newHits, mockOfflineSongs);
-
-      _buildPlaylistsFromSongs([..._featuredSongs, ..._popularSongs, ..._newHits]);
-      _error = null;
-      notifyListeners();
-    }
+    _buildPlaylistsFromSongs(
+        [..._featuredSongs, ..._popularSongs, ..._newHits]);
+    _error = null;
+    notifyListeners();
   }
 
   void _buildPlaylistsFromSongs(List<Song> songs) {
@@ -201,7 +190,8 @@ class HomeProvider extends ChangeNotifier {
         userName: 'Harmony Editors',
         songs: chillSongs,
         songCount: chillSongs.length,
-        totalDuration: chillSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
+        totalDuration:
+            chillSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
         followersCount: 184200,
         isPublic: true,
         isCollaborative: false,
@@ -222,7 +212,8 @@ class HomeProvider extends ChangeNotifier {
         userName: 'Harmony Fitness',
         songs: workoutSongs,
         songCount: workoutSongs.length,
-        totalDuration: workoutSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
+        totalDuration:
+            workoutSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
         followersCount: 94300,
         isPublic: true,
         isCollaborative: false,
@@ -243,7 +234,8 @@ class HomeProvider extends ChangeNotifier {
         userName: 'Harmony Charts',
         songs: chartSongs,
         songCount: chartSongs.length,
-        totalDuration: chartSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
+        totalDuration:
+            chartSongs.fold(0, (sum, s) => sum + s.durationInSeconds),
         followersCount: 521000,
         isPublic: true,
         isCollaborative: false,
@@ -288,6 +280,7 @@ class HomeProvider extends ChangeNotifier {
       final index = list.indexWhere((s) => s.id == updatedSong.id);
       if (index != -1) list[index] = updatedSong;
     }
+
     updateInList(_featuredSongs);
     updateInList(_popularSongs);
     updateInList(_newHits);

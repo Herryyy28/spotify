@@ -4,12 +4,11 @@ import '../models/artist_model.dart';
 import '../models/playlist_model.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
-import '../services/saavn_music_service.dart';
+
 import '../core/utils/logger.dart';
 
 class SearchProvider extends ChangeNotifier {
   final SongRepository _songRepository;
-  final SaavnMusicService _saavnService = SaavnMusicService();
 
   SearchProvider({SongRepository? songRepository})
       : _songRepository = songRepository ?? FirestoreSongRepository() {
@@ -93,17 +92,11 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await Future.wait<List<Song>>([
-        _songRepository.searchByTitle(query),
-        _saavnService.searchSongs(query, limit: 20),
-      ]);
-
-      final firebaseSongs = results[0];
-      final onlineSongs = results[1];
+      final results = await _songRepository.searchByTitle(query);
 
       // Combine unique songs by ID
       final Map<String, Song> uniqueResults = {};
-      for (var song in [...firebaseSongs, ...onlineSongs]) {
+      for (var song in results) {
         uniqueResults[song.id] = song;
       }
 

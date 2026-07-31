@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../providers/player_provider.dart';
 import '../../services/firebase_service.dart';
-import '../../services/saavn_music_service.dart';
 import '../../models/song_model.dart';
 import '../../models/artist_model.dart';
 import '../../models/playlist_model.dart';

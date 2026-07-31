@@ -7,7 +7,6 @@ import '../../core/theme/colors.dart';
 class AdminDashboardTab extends StatelessWidget {
   final bool isDark;
   final Function(int) onNavigate;
-  final VoidCallback onImportTrending;
   final bool isLoadingAction;
   final Widget Function(Song, bool) buildSongTile;
 
@@ -15,7 +14,6 @@ class AdminDashboardTab extends StatelessWidget {
     super.key,
     required this.isDark,
     required this.onNavigate,
-    required this.onImportTrending,
     required this.isLoadingAction,
     required this.buildSongTile,
   });
@@ -149,22 +147,7 @@ class AdminDashboardTab extends StatelessWidget {
                         isWide ? 220.0 : constraints.maxWidth,
                         isDark,
                       ),
-                      _buildQuickAction(
-                        'Import 20 Trending',
-                        Icons.trending_up_rounded,
-                        const Color(0xFF1DB954),
-                        onImportTrending,
-                        isWide ? 220.0 : constraints.maxWidth,
-                        isDark,
-                      ),
-                      _buildQuickAction(
-                        'Search & Import',
-                        Icons.search_rounded,
-                        const Color(0xFF3B82F6),
-                        () => onNavigate(2),
-                        isWide ? 220.0 : constraints.maxWidth,
-                        isDark,
-                      ),
+
                       _buildQuickAction(
                         'Manage Library',
                         Icons.library_music_rounded,
@@ -190,7 +173,7 @@ class AdminDashboardTab extends StatelessWidget {
               const SizedBox(height: 12),
               if (musicProvider.allSongs.isEmpty)
                 _buildEmptyState(isDark, 'No songs yet',
-                    'Add songs manually or import trending tracks')
+                    'Add songs manually using the Add Song tab')
               else
                 ...musicProvider.allSongs
                     .take(5)

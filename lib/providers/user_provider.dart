@@ -9,6 +9,8 @@ import '../data/repositories/firestore_user_repository.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
+
 class UserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final UserRepository _userRepository;
@@ -33,8 +35,6 @@ class UserProvider extends ChangeNotifier {
   List<Song> _likedSongs = [];
   List<Song> _recentlyPlayed = [];
   bool _isLoading = false;
-  String? _error;
-
   // Getters
   User? get user => _user;
   Map<String, dynamic> get profile => _profile;
@@ -46,7 +46,7 @@ class UserProvider extends ChangeNotifier {
   bool get isEmailVerified => _user?.emailVerified ?? false;
   bool get isPremium => _profile['premium'] ?? false;
   bool get isAdmin => _profile['isAdmin'] == true;
-
+  bool get isAnonymous => _user?.isAnonymous ?? false;
   // Constructor handled above
 
   // ============= AUTHENTICATION =============

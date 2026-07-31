@@ -7,6 +7,10 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
+    
+    function isRealUser() {
+      return isSignedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
 
     function isAdmin() {
       return isSignedIn() &&
@@ -42,8 +46,8 @@ service cloud.firestore {
                      (resource.data.isPublic == true ||
                       isOwner(resource.data.userId) ||
                       isAdmin());
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isRealUser() && isOwner(request.resource.data.userId);
+      allow update, delete: if isRealUser() && (isOwner(resource.data.userId) || isAdmin());
     }
 
     // ─── Users ───────────────────────────────────────────────────────────────
@@ -52,14 +56,15 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       // Users can update their own non-admin fields; cannot self-elevate.
-      allow create: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.get('isAdmin', false) == false && request.resource.data.get('premium', false) == false;
       allow update: if isOwner(userId) &&
                        !request.resource.data.diff(resource.data).affectedKeys()
-                         .hasAny(['isAdmin', 'createdAt']);
+                         .hasAny(['isAdmin', 'createdAt', 'premium']);
 
       // Subcollections (likedSongs, history, following)
       match /{subcollection}/{docId} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) && isRealUser();
       }
     }
 
