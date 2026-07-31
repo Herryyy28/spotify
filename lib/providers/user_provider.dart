@@ -177,6 +177,7 @@ class UserProvider extends ChangeNotifier {
   Future<bool> updateProfile(Map<String, dynamic> data) async {
     _setLoading(true);
     try {
+      if (_user != null) {
         // Optimistic update
         _profile.addAll(data);
         notifyListeners();

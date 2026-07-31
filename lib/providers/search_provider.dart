@@ -93,8 +93,8 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await Future.wait([
-        _songRepository.searchSongs(query),
+      final results = await Future.wait<List<Song>>([
+        _songRepository.searchByTitle(query),
         _saavnService.searchSongs(query, limit: 20),
       ]);
 

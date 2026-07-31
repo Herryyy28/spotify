@@ -1,4 +1,4 @@
-import '../../models/user_model.dart'; // We may need to create this if it doesn't exist, or use Map<String, dynamic>
+
 
 abstract class UserRepository {
   /// Fetches a user's profile by ID.

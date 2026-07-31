@@ -192,11 +192,9 @@ class _UploadSongScreenState extends State<UploadSongScreen>
       coverFileName: _useFileUpload ? _coverFileName : null,
     );
 
-    if (uploadedSong != null) {
-      // Push to user-facing screens immediately
-      homeProvider.addSong(uploadedSong);
+    if (song != null) {
       if (mounted) {
-        _showSnack('🎵 "${uploadedSong.title}" uploaded successfully!');
+        _showSnack('🎵 "${song.title}" uploaded successfully!');
         await Future.delayed(const Duration(milliseconds: 800));
         if (mounted) Navigator.pop(context, true);
       }

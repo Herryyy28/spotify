@@ -36,8 +36,8 @@ class _SongManagementScreenState extends State<SongManagementScreen> {
     try {
       // Fetch user songs too? Or mainly just app songs to manage.
       // Assuming Admin can manage ALL songs.
-      // FirebaseService().getSongs() has a limit. Let's assume we fetch a reasonable amount or implement paging later.
-      final songs = await _firebaseService.getSongs(limit: 100);
+      // FirestoreSongRepository.getSongs() has a limit. Let's assume we fetch a reasonable amount or implement paging later.
+      final songs = await _songRepo.getSongs(limit: 100);
       setState(() {
         _songs = songs;
         _filteredSongs = songs;
@@ -86,7 +86,7 @@ class _SongManagementScreenState extends State<SongManagementScreen> {
 
     if (confirmed == true) {
       try {
-        await _firebaseService.deleteSong(song.id);
+        await _songRepo.deleteSong(song.id);
         setState(() {
           _songs.removeWhere((s) => s.id == song.id);
           _filteredSongs.removeWhere((s) => s.id == song.id);
@@ -203,16 +203,16 @@ class _SongManagementScreenState extends State<SongManagementScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.edit, size: 20),
                                   onPressed: () async {
-                                     final result = await Navigator.push(
-                                       context,
-                                       MaterialPageRoute(
-                                         builder: (context) =>
-                                             AdminDashboardScreen(
-                                           songToEdit: song,
-                                           initialTabIndex: 1,
-                                         ),
-                                       ),
-                                     );
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AdminDashboardScreen(
+                                          songToEdit: song,
+                                          initialTabIndex: 1,
+                                        ),
+                                      ),
+                                    );
                                     if (result == true) _loadSongs();
                                   },
                                 ),
