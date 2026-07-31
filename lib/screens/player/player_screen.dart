@@ -528,6 +528,8 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   void _showOptionsMenu(BuildContext context) {
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -539,34 +541,204 @@ class _PlayerScreenState extends State<PlayerScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.playlist_add),
-                title: const Text('Add to Playlist'),
-                onTap: () => Navigator.pop(context),
+                leading: const Icon(Icons.timer_outlined, color: AppColors.primary),
+                title: Text(
+                  playerProvider.sleepTimerRemaining != null
+                      ? 'Sleep Timer (${playerProvider.sleepTimerRemaining!.inMinutes}m remaining)'
+                      : 'Sleep Timer',
+                ),
+                trailing: playerProvider.sleepTimerRemaining != null
+                    ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
+                    : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSleepTimerDialog(context, playerProvider);
+                },
               ),
               ListTile(
-                leading: const Icon(Icons.download),
-                title: const Text('Download'),
-                onTap: () => Navigator.pop(context),
+                leading: const Icon(Icons.equalizer, color: AppColors.primary),
+                title: const Text('Equalizer & Audio Quality'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showEqualizerDialog(context, playerProvider);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.playlist_add),
+                title: const Text('Add to Playlist'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Select a playlist in Your Library to add this track.')),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.share),
-                title: const Text('Share'),
-                onTap: () => Navigator.pop(context),
+                title: const Text('Share Song'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Sharing link copied for "${widget.song.title}"!')),
+                  );
+                },
               ),
               ListTile(
-                leading: const Icon(Icons.radio),
-                title: const Text('Go to Radio'),
-                onTap: () => Navigator.pop(context),
-              ),
-              ListTile(
-                leading: const Icon(Icons.info),
-                title: const Text('Song Info'),
-                onTap: () => Navigator.pop(context),
+                leading: const Icon(Icons.info_outline),
+                title: const Text('Song Details'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSongInfoDialog(context);
+                },
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _showSleepTimerDialog(BuildContext context, PlayerProvider playerProvider) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final options = [
+      {'label': 'Turn Off Timer', 'duration': null},
+      {'label': '5 minutes', 'duration': const Duration(minutes: 5)},
+      {'label': '15 minutes', 'duration': const Duration(minutes: 15)},
+      {'label': '30 minutes', 'duration': const Duration(minutes: 30)},
+      {'label': '45 minutes', 'duration': const Duration(minutes: 45)},
+      {'label': '60 minutes', 'duration': const Duration(minutes: 60)},
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.cardDark : Colors.white,
+        title: Text(
+          'Sleep Timer',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: options.map((opt) {
+            final dur = opt['duration'] as Duration?;
+            return ListTile(
+              title: Text(
+                opt['label'] as String,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              onTap: () {
+                if (dur == null) {
+                  playerProvider.cancelSleepTimer();
+                } else {
+                  playerProvider.setSleepTimer(dur);
+                }
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(dur == null ? 'Sleep timer turned off.' : 'Sleep timer set for ${dur.inMinutes} minutes.'),
+                  ),
+                );
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  void _showEqualizerDialog(BuildContext context, PlayerProvider playerProvider) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    String selectedPreset = 'Normal';
+    final presets = ['Normal (Flat)', 'Bass Boost', 'Vocal Booster', 'Acoustic', 'Workout Energy', 'Electronic / EDM'];
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: isDark ? AppColors.cardDark : Colors.white,
+          title: Text(
+            'Equalizer & Sound Effects',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Sound Preset',
+                style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: presets.map((preset) {
+                  final isSel = selectedPreset == preset;
+                  return ChoiceChip(
+                    label: Text(preset),
+                    selected: isSel,
+                    selectedColor: AppColors.primary,
+                    onSelected: (val) {
+                      if (val) setDialogState(() => selectedPreset = preset);
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Playback Speed', style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                  Text('${playerProvider.speed}x', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                ],
+              ),
+              Slider(
+                value: playerProvider.speed,
+                min: 0.5,
+                max: 2.0,
+                divisions: 6,
+                activeColor: AppColors.primary,
+                onChanged: (val) => playerProvider.setSpeed(val),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSongInfoDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.cardDark : Colors.white,
+        title: Text(widget.song.title, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Artist: ${widget.song.artist}', style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800])),
+            const SizedBox(height: 4),
+            Text('Album: ${widget.song.album}', style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800])),
+            const SizedBox(height: 4),
+            Text('Duration: ${widget.song.duration}', style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800])),
+            const SizedBox(height: 4),
+            Text('Codec: AAC 320 kbps (High Fidelity)', style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800])),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 

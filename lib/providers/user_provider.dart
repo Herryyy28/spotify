@@ -35,6 +35,8 @@ class UserProvider extends ChangeNotifier {
   List<Song> _likedSongs = [];
   List<Song> _recentlyPlayed = [];
   bool _isLoading = false;
+  String? _error;
+
   // Getters
   User? get user => _user;
   Map<String, dynamic> get profile => _profile;

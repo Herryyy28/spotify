@@ -76,7 +76,38 @@ class AudioService {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
 
-    // Listen to audio interruptions
+    // Listen to audio interruptions (phone calls, notifications, etc.)
+    session.interruptionEventStream.listen((event) {
+      if (event.begin) {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            _audioPlayer.setVolume(0.3);
+            break;
+          case AudioInterruptionType.pause:
+          case AudioInterruptionType.unknown:
+            _audioPlayer.pause();
+            break;
+        }
+      } else {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            _audioPlayer.setVolume(1.0);
+            break;
+          case AudioInterruptionType.pause:
+            _audioPlayer.play();
+            break;
+          case AudioInterruptionType.unknown:
+            break;
+        }
+      }
+    });
+
+    // Pause when headphones are unplugged (noisy event)
+    session.becomingNoisyEventStream.listen((_) {
+      _audioPlayer.pause();
+    });
+
+    // Listen to audio playback events
     _audioPlayer.playbackEventStream.listen((event) {
       // Handle playback events
     }, onError: (Object e, StackTrace stackTrace) {
