@@ -106,6 +106,7 @@ class _LyricsWidgetState extends State<LyricsWidget> {
 
     return lyricLines;
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
