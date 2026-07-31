@@ -84,6 +84,9 @@ class FirestoreUserRepository implements UserRepository {
     } catch (e) {
       AppLogger.error('FirestoreUserRepository.getLikedSongIds failed: $e');
       return [];
+    }
+  }
+
   @override
   Future<List<Map<String, dynamic>>> getRecentlyPlayed(String userId, {int limit = 20}) async {
     try {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'admin_dashboard_screen.dart';
 import '../../core/theme/colors.dart';
-import '../../services/firebase_service.dart';
+import '../../data/repositories/firestore_song_repository.dart';
 import '../../models/song_model.dart';
 
 class SongManagementScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class SongManagementScreen extends StatefulWidget {
 }
 
 class _SongManagementScreenState extends State<SongManagementScreen> {
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirestoreSongRepository _songRepo = FirestoreSongRepository();
   final TextEditingController _searchController = TextEditingController();
   List<Song> _songs = [];
   List<Song> _filteredSongs = [];

@@ -6,7 +6,7 @@ import '../providers/player_provider.dart';
 import '../providers/user_provider.dart';
 import '../core/theme/colors.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
-import '../services/firebase_service.dart';
+import '../data/repositories/firestore_song_repository.dart';
 import '../screens/player/player_screen.dart';
 import 'add_to_playlist_sheet.dart';
 
@@ -299,7 +299,7 @@ class SongTile extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await FirebaseService().deleteSong(song.id);
+                await FirestoreSongRepository().deleteSong(song.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Song deleted successfully')),

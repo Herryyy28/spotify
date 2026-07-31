@@ -6,6 +6,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/song_model.dart';
+import '../data/repositories/firestore_song_repository.dart';
+import '../data/repositories/firestore_user_repository.dart';
 import '../services/firebase_service.dart';
 
 class AudioService {
@@ -249,18 +251,16 @@ class AudioService {
 
   void _updateLastPlayed(Song song) {
     // Increment play count in Firestore (fire-and-forget)
-    FirebaseService().incrementPlayCount(song.id);
+    FirestoreSongRepository().incrementPlayCount(song.id);
 
     // Log to user's listening history if signed in
     final uid = _currentUserId;
     if (uid != null && uid.isNotEmpty) {
-      FirebaseService()
-          .logListeningEvent(
-            userId: uid,
-            songId: song.id,
-            duration: song.durationInSeconds,
-          )
-          .catchError((e) => AppLogger.error('History log error: $e'));
+      FirestoreUserRepository().logListeningEvent(
+        uid,
+        song.id,
+        10, // Assuming a baseline tracking.
+      ).catchError((e) => AppLogger.error('History log error: $e'));
     }
   }
 

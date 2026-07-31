@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/song_model.dart';
 import '../services/audio_service.dart';
+import '../data/repositories/firestore_user_repository.dart';
 import '../services/firebase_service.dart';
 
 class PlayerProvider extends ChangeNotifier {
@@ -135,11 +136,11 @@ class PlayerProvider extends ChangeNotifier {
     final song = _trackedSong;
     // Only log if at least 10 s were played to avoid accidental taps
     if (song != null && elapsed >= 10 && _currentUserId != null) {
-      FirebaseService()
+      FirestoreUserRepository()
           .logListeningEvent(
-            userId: _currentUserId!,
-            songId: song.id,
-            duration: elapsed,
+            _currentUserId!,
+            song.id,
+            elapsed,
           )
           .catchError((e) => AppLogger.error('History flush error: $e'));
     }

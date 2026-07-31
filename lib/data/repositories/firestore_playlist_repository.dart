@@ -91,12 +91,15 @@ class FirestorePlaylistRepository implements PlaylistRepository {
   }
 
   @override
-  Future<void> createPlaylist(Playlist playlist) async {
-    await _db.collection(_collection).doc(playlist.id).set({
-      ...playlist.toJson(),
+  Future<Playlist> createPlaylist(Playlist playlist) async {
+    final docRef = _db.collection(_collection).doc();
+    final newPlaylist = playlist.copyWith(id: docRef.id);
+    await docRef.set({
+      ...newPlaylist.toJson(),
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    return newPlaylist;
   }
 
   @override

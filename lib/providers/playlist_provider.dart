@@ -84,7 +84,7 @@ class PlaylistProvider extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      final created = await _firebaseService.createPlaylist(playlist);
+      final created = await _playlistRepository.createPlaylist(playlist);
       _playlists.insert(0, created);
       notifyListeners();
 

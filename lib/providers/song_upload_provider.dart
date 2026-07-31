@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/song_model.dart';
 import '../services/firebase_service.dart';
+import '../data/repositories/song_repository.dart';
+import '../data/repositories/firestore_song_repository.dart';
 
 /// Tracks which phase of the upload pipeline we're in.
 enum UploadPhase {
@@ -15,6 +17,10 @@ enum UploadPhase {
 
 class SongUploadProvider extends ChangeNotifier {
   final FirebaseService _firebase = FirebaseService();
+  final SongRepository _songRepository;
+
+  SongUploadProvider({SongRepository? songRepository})
+      : _songRepository = songRepository ?? FirestoreSongRepository();
 
   // ─── State ───────────────────────────────────────────────────────────────
 
@@ -119,7 +125,7 @@ class SongUploadProvider extends ChangeNotifier {
       );
 
       // ── 4. Save metadata to Firestore ──
-      await _firebase.addSong(song);
+      await _songRepository.addSong(song);
 
       _lastUploadedSong = song;
       _setPhase(UploadPhase.done);

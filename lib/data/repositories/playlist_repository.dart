@@ -18,7 +18,7 @@ abstract class PlaylistRepository {
   Future<Playlist?> getPlaylistById(String id);
 
   /// Creates a new playlist.
-  Future<void> createPlaylist(Playlist playlist);
+  Future<Playlist> createPlaylist(Playlist playlist);
 
   /// Updates an existing playlist.
   Future<void> updatePlaylist(Playlist playlist);

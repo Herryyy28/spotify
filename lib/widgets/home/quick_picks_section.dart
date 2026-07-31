@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../models/song_model.dart';
-import '../../services/firebase_service.dart';
+import '../../data/repositories/firestore_song_repository.dart';
 import '../../providers/player_provider.dart';
 import '../../widgets/song_tile.dart';
 
@@ -35,7 +35,7 @@ class QuickPicksSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         StreamBuilder<List<Song>>(
-          stream: FirebaseService().getSongsStream(limit: 5),
+          stream: FirestoreSongRepository().watchSongs(limit: 5),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Padding(
