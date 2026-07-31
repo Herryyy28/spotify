@@ -494,18 +494,20 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  void _handleGoogleSignIn(UserProvider userProvider) {
-    // Google Sign-In requires platform-specific configuration (SHA fingerprint on Android).
-    // This will be enabled in a future release.
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Google Sign-In coming soon!'),
-        backgroundColor: AppColors.neonBlue,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+  Future<void> _handleGoogleSignIn(UserProvider userProvider) async {
+    final success = await userProvider.signInWithGoogle();
+    if (success && mounted) {
+      if (Navigator.canPop(context)) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } else if (!success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.error ?? 'Google sign in failed'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   void _handleAppleSignIn(UserProvider userProvider) {

@@ -194,6 +194,25 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
 
+                // Developer toggle to easily become an admin
+                if (!userProvider.isAdmin)
+                  _buildSettingsTile(
+                    icon: Icons.developer_mode,
+                    title: 'Enable Admin Mode (Dev)',
+                    isDark: isDark,
+                    onTap: () async {
+                      final success = await userProvider.updateProfile({'isAdmin': true});
+                      if (success && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Admin mode enabled! You can now access the Admin Panel.'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+
                 // Theme Toggle
                 _buildThemeTile(
                   icon: Icons.palette_outlined,
