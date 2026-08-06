@@ -271,31 +271,32 @@ class HomeSliverAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-          child: TabBar(
-            controller: tabController,
-            indicator: const UnderlineTabIndicator(
-              borderSide: BorderSide(
-                color: AppColors.primary,
-                width: 3,
+              child: TabBar(
+                controller: tabController,
+                indicator: const UnderlineTabIndicator(
+                  borderSide: BorderSide(
+                    color: AppColors.primary,
+                    width: 3,
+                  ),
+                  insets: EdgeInsets.symmetric(horizontal: 16),
+                ),
+                labelColor: AppColors.primary,
+                unselectedLabelColor:
+                    isDark ? Colors.grey[400] : Colors.grey[600],
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+                tabs: const [
+                  Tab(text: 'For You'),
+                  Tab(text: 'New Hits'),
+                  Tab(text: 'Charts'),
+                  Tab(text: 'Genres'),
+                ],
               ),
-              insets: EdgeInsets.symmetric(horizontal: 16),
             ),
-            labelColor: AppColors.primary,
-            unselectedLabelColor: isDark ? Colors.grey[400] : Colors.grey[600],
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-            ),
-            tabs: const [
-              Tab(text: 'For You'),
-              Tab(text: 'New Hits'),
-              Tab(text: 'Charts'),
-              Tab(text: 'Genres'),
-            ],
           ),
         ),
-      ),
-      ),
       ),
     );
   }
@@ -315,21 +316,13 @@ class WavePainter extends CustomPainter {
 
     final path = Path();
     path.moveTo(0, size.height * 0.7);
-    
+
     // Create a smooth wave effect
+    path.quadraticBezierTo(size.width * 0.25, size.height * 0.6,
+        size.width * 0.5, size.height * 0.75);
     path.quadraticBezierTo(
-      size.width * 0.25, 
-      size.height * 0.6, 
-      size.width * 0.5, 
-      size.height * 0.75
-    );
-    path.quadraticBezierTo(
-      size.width * 0.75, 
-      size.height * 0.9, 
-      size.width, 
-      size.height * 0.7
-    );
-    
+        size.width * 0.75, size.height * 0.9, size.width, size.height * 0.7);
+
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
