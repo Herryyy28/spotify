@@ -47,7 +47,8 @@ service cloud.firestore {
                       isOwner(resource.data.userId) ||
                       isAdmin());
       allow create: if isRealUser() && isOwner(request.resource.data.userId);
-      allow update, delete: if isRealUser() && (isOwner(resource.data.userId) || isAdmin());
+      allow update: if isRealUser() && (isOwner(resource.data.userId) || isAdmin()) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isRealUser() && (isOwner(resource.data.userId) || isAdmin());
     }
 
     // ─── Users ───────────────────────────────────────────────────────────────

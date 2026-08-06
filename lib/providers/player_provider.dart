@@ -195,31 +195,34 @@ class PlayerProvider extends ChangeNotifier {
   Future<void> seekTo(Duration position) async {
     await _audioService.seek(position);
   }
+  
+  Future<void> seekToIndex(int index) async {
+    await _audioService.seekToIndex(index);
+  }
 
   // Playlist management
   Future<void> setPlaylist(List<Song> playlist, {int initialIndex = 0}) async {
     await _audioService.setPlaylist(playlist, initialIndex: initialIndex);
-    _currentPlaylist = playlist;
-    _currentIndex = initialIndex;
-    notifyListeners();
   }
 
-  void addToPlaylist(Song song) {
-    _currentPlaylist.add(song);
-    notifyListeners();
+  Future<void> addNext(Song song) async {
+    await _audioService.addNext(song);
   }
 
-  void removeFromPlaylist(int index) {
-    _currentPlaylist.removeAt(index);
-    if (_currentIndex >= index && _currentIndex > 0) {
-      _currentIndex--;
-    }
-    notifyListeners();
+  Future<void> addToQueue(Song song) async {
+    await _audioService.addToQueue(song);
   }
 
-  void clearPlaylist() {
-    _currentPlaylist.clear();
-    notifyListeners();
+  Future<void> reorderQueue(int oldIndex, int newIndex) async {
+    await _audioService.reorderQueue(oldIndex, newIndex);
+  }
+
+  Future<void> removeFromQueue(int index) async {
+    await _audioService.removeFromQueue(index);
+  }
+
+  Future<void> clearQueue() async {
+    await _audioService.clearQueue();
   }
 
   // Settings

@@ -24,7 +24,7 @@ import 'providers/social_provider.dart';
 import 'providers/podcast_provider.dart';
 import 'providers/listening_room_provider.dart';
 import 'providers/song_upload_provider.dart';
-import 'core/theme/app_theme.dart';
+import 'app/app.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
@@ -43,6 +43,7 @@ Future<void> main() async {
     try {
       await Hive.initFlutter();
       await Hive.openBox('downloads');
+      await Hive.openBox('user_cache');
       AppLogger.info('Hive initialized');
     } catch (e) {
       AppLogger.error('Error initializing Hive: $e');
@@ -98,118 +99,12 @@ Future<void> main() async {
     AppLogger.error('Critical error during initialization: $e');
   }
 
-  runApp(MyApp(
+  runApp(HarmonyApp(
     firebaseInitialized: _firebaseInitialized,
     onboardingComplete: (await SharedPreferences.getInstance())
             .getBool('onboarding_complete') ??
         false,
   ));
-}
-
-class MyApp extends StatelessWidget {
-  final bool firebaseInitialized;
-  final bool onboardingComplete;
-
-  const MyApp(
-      {super.key,
-      required this.firebaseInitialized,
-      this.onboardingComplete = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => PlayerProvider()),
-        ChangeNotifierProvider(create: (_) => PlaylistProvider()),
-        ChangeNotifierProvider(create: (_) => PodcastProvider()),
-        ChangeNotifierProvider(create: (_) => ListeningRoomProvider()),
-        ChangeNotifierProvider(create: (_) => SongUploadProvider()),
-        if (firebaseInitialized) ...[
-          // Wire UserProvider after PlayerProvider so auth state forwards userId
-          ChangeNotifierProxyProvider<PlayerProvider, UserProvider>(
-            create: (_) => UserProvider(),
-            update: (_, player, user) {
-              user!.attachPlayerProvider(player);
-              return user;
-            },
-          ),
-          ChangeNotifierProvider(create: (_) => HomeProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
-          ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
-          ChangeNotifierProvider(create: (_) => SocialProvider()),
-        ],
-      ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            title: 'Harmony Music',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeModeValue,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''),
-              Locale('es', ''),
-              Locale('fr', ''),
-            ],
-            routes: {
-              '/admin': (context) => const AdminDashboardScreen(),
-              '/login': (context) => const LoginScreen(),
-              '/room': (context) => const ListenRoomScreen(),
-              '/upload': (context) => const UploadSongScreen(),
-            },
-            home: firebaseInitialized
-                ? Consumer<UserProvider>(
-                    builder: (context, userProvider, _) {
-                      if (!userProvider.isAuthenticated)
-                        return const LoginScreen();
-                      if (!onboardingComplete) return const OnboardingScreen();
-                      return const MainScreen();
-                    },
-                  )
-                : const Scaffold(
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.error_outline,
-                              size: 64, color: Colors.red),
-                          SizedBox(height: 16),
-                          Text(
-                            'Firebase Not Initialized',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 32),
-                            child: Text(
-                              'Please ensure google-services.json is placed in android/app/ directory.\n\nRun "flutterfire configure" to generate Firebase configuration.',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-            builder: (context, child) {
-              return ScrollConfiguration(
-                behavior: MyCustomScrollBehavior(),
-                child: child!,
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {

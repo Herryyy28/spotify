@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../models/song_model.dart';
 import '../../providers/user_provider.dart';
+import '../../core/widgets/harmony_card.dart';
 
 class RecentlyPlayedSection extends StatelessWidget {
   final Function(Song) onPlaySong;
@@ -50,21 +51,11 @@ class RecentlyPlayedSection extends StatelessWidget {
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final song = recent[index];
-                  return GestureDetector(
-                    onTap: () => onPlaySong(song),
-                    child: Container(
-                      width: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Theme.of(context).cardColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
+                  return SizedBox(
+                    width: 120,
+                    child: HarmonyCard(
+                      padding: EdgeInsets.zero,
+                      onTap: () => onPlaySong(song),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

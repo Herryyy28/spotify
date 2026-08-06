@@ -6,10 +6,12 @@ import '../core/theme/colors.dart';
 
 class LyricsWidget extends StatefulWidget {
   final Song song;
+  final Duration? currentPosition;
 
   const LyricsWidget({
     super.key,
     required this.song,
+    this.currentPosition,
   });
 
   @override
@@ -30,7 +32,60 @@ class _LyricsWidgetState extends State<LyricsWidget> {
     _fetchLyrics();
   }
 
+  @override
+  void didUpdateWidget(covariant LyricsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.song.id != oldWidget.song.id) {
+      _fetchLyrics();
+    } else if (widget.currentPosition != oldWidget.currentPosition &&
+        _lyrics.isNotEmpty) {
+      _updateCurrentLine();
+    }
+  }
+
+  void _updateCurrentLine() {
+    if (widget.currentPosition == null) return;
+    final position = widget.currentPosition!;
+    
+    int newIndex = -1;
+    for (int i = 0; i < _lyrics.length; i++) {
+      if (_lyrics[i].timestamp != null) {
+        if (position >= _lyrics[i].timestamp!) {
+          newIndex = i;
+        } else {
+          break; // Found the current line
+        }
+      }
+    }
+
+    if (newIndex != _currentLineIndex && newIndex != -1) {
+      setState(() {
+        _currentLineIndex = newIndex;
+      });
+      _scrollToCurrentLine();
+    }
+  }
+
+  void _scrollToCurrentLine() {
+    if (!_scrollController.hasClients || _currentLineIndex < 0) return;
+    
+    // Estimate item height
+    const itemHeight = 40.0;
+    final targetOffset = (_currentLineIndex * itemHeight) - 100.0;
+    
+    _scrollController.animateTo(
+      targetOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   Future<void> _fetchLyrics() async {
+    setState(() {
+      _isLoading = true;
+      _currentLineIndex = -1;
+    });
+
     if (widget.song.lyricsUrl != null && widget.song.lyricsUrl!.isNotEmpty) {
       try {
         final response = await http.get(Uri.parse(widget.song.lyricsUrl!));
@@ -44,26 +99,17 @@ class _LyricsWidgetState extends State<LyricsWidget> {
           return;
         }
       } catch (e) {
-        // Fallback to generated demo lyrics
+        // Fallback to error state or demo lyrics
       }
     }
 
     // Fallback demo lyrics for preview
     setState(() {
       _lyrics = [
-        LyricLine(text: '🎵 ${widget.song.title}'),
-        LyricLine(text: 'Artist: ${widget.song.artist}'),
-        LyricLine(text: 'Album: ${widget.song.album}'),
-        LyricLine(text: ''),
-        LyricLine(text: 'Lost in the rhythm of the night'),
-        LyricLine(text: 'Harmony playing soft and bright'),
-        LyricLine(text: 'Feel the melody flow in your soul'),
-        LyricLine(text: 'Let the music take control'),
-        LyricLine(text: ''),
-        LyricLine(text: 'Sunlight fading, stars align'),
-        LyricLine(text: 'Every moment feels divine'),
-        LyricLine(text: 'Listen close and hear the sound'),
-        LyricLine(text: 'Best vibes that can be found'),
+        LyricLine(timestamp: const Duration(seconds: 0), text: '🎵 ${widget.song.title}'),
+        LyricLine(timestamp: const Duration(seconds: 5), text: 'Artist: ${widget.song.artist}'),
+        LyricLine(timestamp: const Duration(seconds: 10), text: 'Album: ${widget.song.album}'),
+        LyricLine(timestamp: const Duration(seconds: 15), text: '...'),
       ];
       _isLoading = false;
       _hasError = false;
@@ -74,11 +120,10 @@ class _LyricsWidgetState extends State<LyricsWidget> {
     final lines = lyrics.split('\n');
     final List<LyricLine> lyricLines = [];
 
-    for (final line in lines) {
-      // Parse timestamp format: [mm:ss.xx] lyric text
-      final regex = RegExp(r'\[(\d{2}):(\d{2})\.(\d{2})\](.*)');
-      final match = regex.firstMatch(line);
+    final regex = RegExp(r'\[(\d{2}):(\d{2})\.(\d{2})\](.*)');
 
+    for (final line in lines) {
+      final match = regex.firstMatch(line);
       if (match != null) {
         final minutes = int.parse(match.group(1)!);
         final seconds = int.parse(match.group(2)!);
@@ -96,14 +141,12 @@ class _LyricsWidgetState extends State<LyricsWidget> {
           text: text,
         ));
       } else if (line.trim().isNotEmpty) {
-        // Lines without timestamp
         lyricLines.add(LyricLine(
           timestamp: null,
           text: line.trim(),
         ));
       }
     }
-
     return lyricLines;
   }
 
@@ -151,7 +194,7 @@ class _LyricsWidgetState extends State<LyricsWidget> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
       itemCount: _lyrics.length,
       itemBuilder: (context, index) {
         final lyric = _lyrics[index];
@@ -160,11 +203,11 @@ class _LyricsWidgetState extends State<LyricsWidget> {
         return AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: (theme.textTheme.bodyLarge ?? const TextStyle()).copyWith(
-            fontSize: isCurrent ? 20 : 16,
+            fontSize: isCurrent ? 22 : 16,
             fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
             color: isCurrent
                 ? AppColors.primary
-                : theme.textTheme.bodyLarge?.color,
+                : theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
             height: 1.8,
           ),
           child: Container(
@@ -194,48 +237,4 @@ class LyricLine {
     this.timestamp,
     required this.text,
   });
-}
-
-class SyncedLyricsWidget extends StatefulWidget {
-  final Song song;
-  final Stream<Duration> positionStream;
-
-  const SyncedLyricsWidget({
-    super.key,
-    required this.song,
-    required this.positionStream,
-  });
-
-  @override
-  _SyncedLyricsWidgetState createState() => _SyncedLyricsWidgetState();
-}
-
-class _SyncedLyricsWidgetState extends State<SyncedLyricsWidget> {
-  final LyricsController _controller = LyricsController();
-
-  @override
-  void initState() {
-    super.initState();
-    widget.positionStream.listen((position) {
-      _controller.updatePosition(position);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LyricsWidget(song: widget.song);
-  }
-}
-
-class LyricsController extends ChangeNotifier {
-  Duration _currentPosition = Duration.zero;
-  final int _currentLine = -1;
-
-  Duration get currentPosition => _currentPosition;
-  int get currentLine => _currentLine;
-
-  void updatePosition(Duration position) {
-    _currentPosition = position;
-    notifyListeners();
-  }
 }

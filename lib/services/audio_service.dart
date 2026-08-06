@@ -1,6 +1,7 @@
 import 'package:harmony_music/core/utils/logger.dart';
 import 'dart:async';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -71,6 +72,8 @@ class AudioService {
         ),
       );
 
+  late ConcatenatingAudioSource _playlistSource;
+
   Future<void> initialize() async {
     // Setup audio session
     final session = await AudioSession.instance;
@@ -114,23 +117,41 @@ class AudioService {
       AppLogger.error('Audio error: $e');
     });
 
-    // Set up audio loading interceptor
-    _audioPlayer.setAudioSource(_createPlaylistSource());
-
-    // Initialize shuffle indices
-    _updateShuffledIndices();
-  }
-
-  ConcatenatingAudioSource _createPlaylistSource() {
-    return ConcatenatingAudioSource(
+    _playlistSource = ConcatenatingAudioSource(
       useLazyPreparation: true,
-      children: _playlist.value.map((song) {
-        return AudioSource.uri(
-          Uri.parse(song.audioUrl),
-          tag: kIsWeb ? null : song,
-        );
-      }).toList(),
+      children: [],
     );
+    await _audioPlayer.setAudioSource(_playlistSource);
+
+    // Track sequence state to update our BehaviorSubject
+    _audioPlayer.sequenceStateStream.listen((sequenceState) {
+      if (sequenceState == null) return;
+      final sequence = sequenceState.sequence;
+      
+      final currentSongs = sequence.map((indexedAudioSource) {
+        final tag = indexedAudioSource.tag;
+        if (tag is MediaItem && tag.extras != null && tag.extras!['song'] != null) {
+          return Song.fromJson(tag.extras!['song'] as Map<String, dynamic>);
+        } else if (tag is MediaItem) {
+           return Song(
+            id: tag.id,
+            title: tag.title,
+            artist: tag.artist ?? 'Unknown Artist',
+            album: tag.album ?? 'Unknown Album',
+            coverUrl: tag.artUri?.toString() ?? '',
+            audioUrl: '', // URL is not strictly needed back here
+            duration: '',
+            durationInSeconds: 0,
+            releaseDate: DateTime.now(),
+          );
+        }
+        return null;
+      }).whereType<Song>().toList();
+      
+      _playlist.add(currentSongs);
+      _currentIndex.add(sequenceState.currentIndex);
+      _updateShuffledIndices();
+    });
   }
 
   Future<void> playSong(Song song, {List<Song>? playlist}) async {
@@ -140,7 +161,17 @@ class AudioService {
       }
 
       await _audioPlayer.setAudioSource(
-        AudioSource.uri(Uri.parse(song.audioUrl)),
+        AudioSource.uri(
+          Uri.parse(song.audioUrl),
+          tag: kIsWeb
+              ? null
+              : MediaItem(
+                  id: song.id,
+                  album: song.artist,
+                  title: song.title,
+                  artUri: Uri.parse(song.coverUrl),
+                ),
+        ),
       );
       await _audioPlayer.play();
 
@@ -156,6 +187,12 @@ class AudioService {
   Future<void> pause() => _audioPlayer.pause();
   Future<void> stop() => _audioPlayer.stop();
   Future<void> seek(Duration position) => _audioPlayer.seek(position);
+  
+  Future<void> seekToIndex(int index) async {
+    if (index >= 0 && index < _playlistSource.length) {
+      await _audioPlayer.seek(Duration.zero, index: index);
+    }
+  }
 
   Future<void> next() async {
     if (_playlist.value.isEmpty) return;
@@ -219,27 +256,72 @@ class AudioService {
   }
 
   Future<void> setPlaylist(List<Song> playlist, {int initialIndex = 0}) async {
-    _playlist.add(playlist);
-    _currentIndex.add(initialIndex);
-    _updateShuffledIndices();
-
-    await _audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(
-        useLazyPreparation: true,
-        children: playlist.map((song) {
-          return AudioSource.uri(
-            Uri.parse(song.audioUrl),
-            tag: kIsWeb ? null : song,
-          );
-        }).toList(),
+    final audioSources = playlist.map((song) => AudioSource.uri(
+      Uri.parse(song.audioUrl),
+      tag: kIsWeb ? null : MediaItem(
+        id: song.id,
+        album: song.artist,
+        title: song.title,
+        artUri: Uri.parse(song.coverUrl),
+        extras: {'song': song.toJson()},
       ),
-      initialIndex: initialIndex,
-    );
+    )).toList();
+
+    await _playlistSource.clear();
+    await _playlistSource.addAll(audioSources);
+    
+    if (playlist.isNotEmpty) {
+      await _audioPlayer.seek(Duration.zero, index: initialIndex);
+    }
+  }
+
+  Future<void> addNext(Song song) async {
+    final index = (_audioPlayer.currentIndex ?? -1) + 1;
+    await _playlistSource.insert(index, AudioSource.uri(
+      Uri.parse(song.audioUrl),
+      tag: kIsWeb ? null : MediaItem(
+        id: song.id,
+        album: song.artist,
+        title: song.title,
+        artUri: Uri.parse(song.coverUrl),
+        extras: {'song': song.toJson()},
+      ),
+    ));
+  }
+
+  Future<void> addToQueue(Song song) async {
+    await _playlistSource.add(AudioSource.uri(
+      Uri.parse(song.audioUrl),
+      tag: kIsWeb ? null : MediaItem(
+        id: song.id,
+        album: song.artist,
+        title: song.title,
+        artUri: Uri.parse(song.coverUrl),
+        extras: {'song': song.toJson()},
+      ),
+    ));
+  }
+
+  Future<void> reorderQueue(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1; // Adjust for the item being removed before insertion
+    }
+    await _playlistSource.move(oldIndex, newIndex);
+  }
+
+  Future<void> removeFromQueue(int index) async {
+    if (index >= 0 && index < _playlistSource.length) {
+      await _playlistSource.removeAt(index);
+    }
+  }
+
+  Future<void> clearQueue() async {
+    await _playlistSource.clear();
   }
 
   void toggleShuffle() {
     _shuffleMode.add(!_shuffleMode.value);
-    _updateShuffledIndices();
+    _audioPlayer.setShuffleModeEnabled(_shuffleMode.value);
   }
 
   void toggleRepeat() {

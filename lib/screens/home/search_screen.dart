@@ -9,6 +9,7 @@ import '../../models/playlist_model.dart';
 import '../../widgets/song_tile.dart';
 import '../../core/theme/colors.dart';
 import '../player/player_screen.dart';
+import '../../core/widgets/harmony_text_field.dart';
 import '../../providers/search_provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -58,80 +59,23 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (isDark
-                                    ? AppColors.elevatedDark
-                                    : Colors.grey[100]!)
-                                .withValues(alpha: 0.8),
-                            (isDark ? AppColors.cardDark : Colors.grey[50]!)
-                                .withValues(alpha: 0.8),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 
-                            _searchController.text.isNotEmpty ? 0.5 : 0.1,
-                          ),
-                          width: 2,
-                        ),
-                        boxShadow: _searchController.text.isNotEmpty
-                            ? [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.2),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: searchProvider.performSearch,
-                        autofocus: true,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Search songs, artists, albums...',
-                          hintStyle: TextStyle(
-                            color: isDark ? Colors.grey[500] : Colors.grey[400],
-                            fontWeight: FontWeight.w400,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search_rounded,
-                            color: _searchController.text.isNotEmpty
-                                ? AppColors.primary
-                                : (isDark
-                                    ? Colors.grey[500]
-                                    : Colors.grey[400]),
-                            size: 24,
-                          ),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: Icon(
-                                    Icons.clear_rounded,
-                                    color: isDark
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
-                                  ),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    searchProvider.performSearch('');
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
+                    child: HarmonyTextField(
+                      controller: _searchController,
+                      hintText: 'Search songs, artists, albums...',
+                      prefixIcon: Icons.search_rounded,
+                      onChanged: searchProvider.performSearch,
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear_rounded,
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                searchProvider.performSearch('');
+                              },
+                            )
+                          : null,
                     ),
                   ),
                   if (searchProvider.isSearching) ...[
@@ -204,7 +148,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSearchResults(SearchProvider searchProvider) {
     if (!searchProvider.isSearching) {
-      return _buildRecentSearches(searchProvider);
+      return ListView(
+        children: [
+          _buildRecentSearches(searchProvider),
+          _buildBrowseCategories(),
+        ],
+      );
     }
 
     if (searchProvider.isLoading) {
@@ -314,7 +263,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final theme = Theme.of(context);
 
     if (searchProvider.recentSearches.isEmpty) {
-      return const Center(child: Text("No recent searches"));
+      return const SizedBox.shrink();
     }
 
     return Column(
@@ -338,28 +287,103 @@ class _SearchScreenState extends State<SearchScreen> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: searchProvider.recentSearches.length,
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: searchProvider.recentSearches.length,
+          itemBuilder: (context, index) {
+            final search = searchProvider.recentSearches[index];
+            return ListTile(
+              leading: const Icon(Icons.history, color: Colors.grey),
+              title: Text(search),
+              trailing: IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () => searchProvider.removeRecentSearch(search),
+              ),
+              onTap: () {
+                _searchController.text = search;
+                searchProvider.performSearch(search);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBrowseCategories() {
+    final theme = Theme.of(context);
+    final categories = [
+      {'name': 'Pop', 'color': Colors.pink},
+      {'name': 'Rock', 'color': Colors.red},
+      {'name': 'Hip-Hop', 'color': Colors.orange},
+      {'name': 'Jazz', 'color': Colors.purple},
+      {'name': 'Podcasts', 'color': Colors.green},
+      {'name': 'Moods', 'color': Colors.blue},
+      {'name': 'Workout', 'color': Colors.teal},
+      {'name': 'Sleep', 'color': Colors.indigo},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Browse All',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: categories.length,
             itemBuilder: (context, index) {
-              final search = searchProvider.recentSearches[index];
-              return ListTile(
-                leading: const Icon(Icons.history, color: Colors.grey),
-                title: Text(search),
-                trailing: IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  onPressed: () => searchProvider.removeRecentSearch(search),
+              final cat = categories[index];
+              return Container(
+                decoration: BoxDecoration(
+                  color: cat['color'] as Color,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                onTap: () {
-                  _searchController.text = search;
-                  searchProvider.performSearch(search);
-                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        cat['name'] as String,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               );
             },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

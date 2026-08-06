@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:harmony_music/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 import '../services/auth_service.dart';
 import '../models/song_model.dart';
 import 'player_provider.dart';
@@ -277,17 +279,41 @@ class UserProvider extends ChangeNotifier {
   Future<void> loadLikedSongs() async {
     if (_user != null) {
       try {
+        final box = Hive.box('user_cache');
+        // Try loading from cache first
+        try {
+          final cachedLikedSongs = box.get('liked_songs_${_user!.uid}');
+          if (cachedLikedSongs != null) {
+            final List<dynamic> decodedList = jsonDecode(cachedLikedSongs);
+            _likedSongs = decodedList.map((s) => Song.fromJson(s)).toList();
+            notifyListeners();
+          }
+        } catch (e) {
+          AppLogger.error('Cache read error: $e');
+        }
+
         final likedIds = await _userRepository.getLikedSongIds(_user!.uid);
 
-        _likedSongs = [];
+        final List<Song> freshLikedSongs = [];
         for (final id in likedIds) {
           try {
             final song = await _songRepository.getSongById(id);
-            _likedSongs.add(song);
+            freshLikedSongs.add(song);
           } catch (e) {
             AppLogger.warning('Could not load liked song $id: $e');
           }
         }
+        
+        _likedSongs = freshLikedSongs;
+        
+        // Update cache silently
+        try {
+          final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+          box.put('liked_songs_${_user!.uid}', encodedList);
+        } catch (e) {
+          AppLogger.error('Cache write error: $e');
+        }
+        
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading liked songs: $e');
@@ -302,6 +328,11 @@ class UserProvider extends ChangeNotifier {
       await _userRepository.toggleLikedSong(_user!.uid, song.id);
       if (!isSongLiked(song.id)) {
         _likedSongs.add(song);
+        try {
+          final box = Hive.box('user_cache');
+          final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+          box.put('liked_songs_${_user!.uid}', encodedList);
+        } catch (_) {}
       }
       notifyListeners();
       return true;
@@ -317,6 +348,11 @@ class UserProvider extends ChangeNotifier {
     try {
       await _userRepository.toggleLikedSong(_user!.uid, songId);
       _likedSongs.removeWhere((s) => s.id == songId);
+      try {
+        final box = Hive.box('user_cache');
+        final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+        box.put('liked_songs_${_user!.uid}', encodedList);
+      } catch (_) {}
       notifyListeners();
       return true;
     } catch (e) {
@@ -334,18 +370,42 @@ class UserProvider extends ChangeNotifier {
   Future<void> loadRecentlyPlayed() async {
     if (_user != null) {
       try {
+        final box = Hive.box('user_cache');
+        // Try loading from cache first
+        try {
+          final cachedRecent = box.get('recent_songs_${_user!.uid}');
+          if (cachedRecent != null) {
+            final List<dynamic> decodedList = jsonDecode(cachedRecent);
+            _recentlyPlayed = decodedList.map((s) => Song.fromJson(s)).toList();
+            notifyListeners();
+          }
+        } catch (e) {
+          AppLogger.error('Cache read error: $e');
+        }
+
         final history = await _userRepository.getRecentlyPlayed(_user!.uid);
-        _recentlyPlayed = [];
+        final List<Song> freshRecentlyPlayed = [];
         for (final item in history) {
           try {
             final song = await _songRepository.getSongById(item['songId']);
-            if (!_recentlyPlayed.any((s) => s.id == song.id)) {
-              _recentlyPlayed.add(song);
+            if (!freshRecentlyPlayed.any((s) => s.id == song.id)) {
+              freshRecentlyPlayed.add(song);
             }
           } catch (e) {
             AppLogger.warning('Could not load recent song: $e');
           }
         }
+        
+        _recentlyPlayed = freshRecentlyPlayed;
+        
+        // Update cache silently
+        try {
+          final encodedList = jsonEncode(_recentlyPlayed.map((s) => s.toJson()).toList());
+          box.put('recent_songs_${_user!.uid}', encodedList);
+        } catch (e) {
+          AppLogger.error('Cache write error: $e');
+        }
+        
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading recently played: $e');

@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import '../core/utils/logger.dart';
 import '../models/playlist_model.dart';
 import '../models/song_model.dart';
 import '../data/repositories/playlist_repository.dart';
@@ -33,7 +36,31 @@ class PlaylistProvider extends ChangeNotifier {
     try {
       final currentUserId = userId ?? _firebaseService.userId;
       if (currentUserId != null) {
+        // Try loading from cache first
+        try {
+          final box = Hive.box('user_cache');
+          final cachedPlaylists = box.get('playlists_$currentUserId');
+          if (cachedPlaylists != null) {
+            final List<dynamic> decodedList = jsonDecode(cachedPlaylists);
+            _playlists = decodedList.map((p) => Playlist.fromJson(p)).toList();
+            // Don't set loading to false yet, show cached data but keep refreshing
+            notifyListeners(); 
+          }
+        } catch (e) {
+          AppLogger.error('Cache read error: $e');
+        }
+
+        // Fetch fresh from remote
         _playlists = await _playlistRepository.getUserPlaylists(currentUserId);
+        
+        // Update cache silently
+        try {
+          final box = Hive.box('user_cache');
+          final encodedList = jsonEncode(_playlists.map((p) => p.toJson()).toList());
+          box.put('playlists_$currentUserId', encodedList);
+        } catch (e) {
+          AppLogger.error('Cache write error: $e');
+        }
       }
       _error = null;
     } catch (e) {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../providers/music_provider.dart';
 import '../../core/theme/colors.dart';
+import '../../core/widgets/harmony_card.dart';
 
 class RecommendedPlaylistsSection extends StatelessWidget {
   const RecommendedPlaylistsSection({super.key});
@@ -55,25 +56,17 @@ class RecommendedPlaylistsSection extends StatelessWidget {
                   return Container(
                     width: 150,
                     margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: AppColors.popularGradients[
-                          index % AppColors.popularGradients.length],
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
+                    child: HarmonyCard(
+                      padding: EdgeInsets.zero,
+                      onTap: () {
+                        // Navigate to playlist detail
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: AppColors.popularGradients[
+                              index % AppColors.popularGradients.length],
                         ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () {
-                          // Navigate to playlist detail
-                        },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

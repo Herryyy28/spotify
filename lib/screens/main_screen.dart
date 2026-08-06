@@ -10,6 +10,13 @@ import 'settings/settings_screen.dart';
 import 'local_files/local_files_screen.dart';
 import '../widgets/now_playing_bar.dart';
 import 'admin/admin_dashboard_screen.dart';
+import '../core/responsive/breakpoints.dart';
+import '../core/responsive/responsive_layout.dart';
+import 'podcast/podcast_browse_screen.dart';
+import 'social/listen_room_screen.dart';
+import 'statistics/statistics_screen.dart';
+import 'auth/login_screen.dart';
+import '../services/auth_service.dart';
 
 /// Responsive main screen with Spotify-style navigation
 /// - Desktop/Tablet (>600px): Sidebar navigation
@@ -28,8 +35,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
-    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    final isMobile = ResponsiveLayout.isMobile(context);
+    final isTablet = ResponsiveLayout.isTablet(context);
     final userProvider = Provider.of<UserProvider>(context);
 
     // List of screens available in the app
@@ -53,6 +60,7 @@ class _MainScreenState extends State<MainScreen> {
           const NowPlayingBar(),
         ],
       ),
+      drawer: isMobile ? Drawer(child: _buildSidebar(isDark, false)) : null,
       bottomNavigationBar:
           isMobile ? _buildBottomNav(isDark, userProvider.isAdmin) : null,
     );
@@ -92,24 +100,32 @@ class _MainScreenState extends State<MainScreen> {
       ),
       child: Column(
         children: [
-          // Logo
+          // ===== APP LOGO =====
           Padding(
             padding: EdgeInsets.all(isTablet ? 20 : 24),
             child: Row(
               children: [
-                Icon(
-                  Icons.music_note_rounded,
-                  color: AppColors.primary,
-                  size: isTablet ? 28 : 32,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.spotifyGradient,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.music_note_rounded,
+                    color: Colors.white,
+                    size: isTablet ? 24 : 28,
+                  ),
                 ),
                 if (!isTablet) ...[
                   const SizedBox(width: 12),
                   Text(
-                    'Spotify',
+                    'Harmony Music',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : Colors.black,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ],
@@ -117,7 +133,9 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
 
-          // Navigation
+          // ===== 🏠 CORE NAVIGATION =====
+          if (!isTablet)
+            _buildSectionLabel('MENU', isDark),
           _buildNavItem(
             icon: Icons.home_rounded,
             label: 'Home',
@@ -140,40 +158,80 @@ class _MainScreenState extends State<MainScreen> {
             compact: isTablet,
           ),
 
-          if (userProvider.isAdmin)
-            _buildNavItem(
-              icon: Icons.admin_panel_settings_rounded,
-              label: 'Admin Panel',
-              index: 3,
-              isDark: isDark,
-              compact: isTablet,
-            ),
-
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Divider(
             color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
             height: 1,
+            indent: 16,
+            endIndent: 16,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
-          // Actions
+          // ===== 🎵 QUICK ACTIONS & COLLECTIONS =====
+          if (!isTablet)
+            _buildSectionLabel('COLLECTIONS', isDark),
           _buildActionItem(
-            icon: Icons.add_box_outlined,
+            icon: Icons.add_box_rounded,
             label: 'Create Playlist',
             isDark: isDark,
             compact: isTablet,
-            onTap: () {},
+            onTap: () {
+              // TODO: Open create playlist dialog
+            },
           ),
           _buildActionItem(
-            icon: Icons.favorite,
+            icon: Icons.favorite_rounded,
             label: 'Liked Songs',
             isDark: isDark,
             compact: isTablet,
             iconColor: AppColors.neonPink,
-            onTap: () {},
+            onTap: () {
+              // TODO: Navigate to liked songs
+            },
           ),
           _buildActionItem(
-            icon: Icons.folder_outlined,
+            icon: Icons.podcasts_rounded,
+            label: 'Podcasts',
+            isDark: isDark,
+            compact: isTablet,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PodcastBrowseScreen(),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 8),
+          Divider(
+            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+          const SizedBox(height: 8),
+
+          // ===== 👥 SOCIAL & FEATURES =====
+          if (!isTablet)
+            _buildSectionLabel('SOCIAL & MORE', isDark),
+          _buildActionItem(
+            icon: Icons.headset_mic_rounded,
+            label: 'Listening Room',
+            isDark: isDark,
+            compact: isTablet,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ListenRoomScreen(),
+                ),
+              );
+            },
+          ),
+          _buildActionItem(
+            icon: Icons.folder_open_rounded,
             label: 'Local Files',
             isDark: isDark,
             compact: isTablet,
@@ -186,16 +244,43 @@ class _MainScreenState extends State<MainScreen> {
               );
             },
           ),
+          _buildActionItem(
+            icon: Icons.download_for_offline_rounded,
+            label: 'Downloads',
+            isDark: isDark,
+            compact: isTablet,
+            onTap: () {
+              // TODO: Navigate to downloads screen
+            },
+          ),
+          _buildActionItem(
+            icon: Icons.bar_chart_rounded,
+            label: 'Statistics',
+            isDark: isDark,
+            compact: isTablet,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsScreen(),
+                ),
+              );
+            },
+          ),
 
           if (!isTablet) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Divider(
               color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
               height: 1,
+              indent: 16,
+              endIndent: 16,
             ),
+            // ===== PLAYLISTS =====
+            _buildSectionLabel('YOUR PLAYLISTS', isDark),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 children: [
                   _buildPlaylistItem('My Playlist #1', isDark),
                   _buildPlaylistItem('Chill Vibes', isDark),
@@ -208,55 +293,93 @@ class _MainScreenState extends State<MainScreen> {
           ] else
             const Spacer(),
 
-          // Profile - Use Consumer to safely access UserProvider
+          // ===== ⚙️ ACCOUNT & SETTINGS =====
+          Divider(
+            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+            height: 1,
+          ),
+          // Admin Panel (only for admins)
+          if (userProvider.isAdmin)
+            _buildActionItem(
+              icon: Icons.admin_panel_settings_rounded,
+              label: 'Admin Panel',
+              isDark: isDark,
+              compact: isTablet,
+              iconColor: Colors.orange,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminDashboardScreen(),
+                  ),
+                );
+              },
+            ),
           Consumer<UserProvider>(
             builder: (context, userProvider, child) {
               return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: isDark
-                          ? AppColors.dividerDark
-                          : AppColors.dividerLight,
-                      width: 1,
-                    ),
-                  ),
-                ),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: AppColors.primary,
-                      child: Text(
-                        (userProvider.user?.displayName?.substring(0, 1) ?? 'U')
-                            .toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    // Profile avatar
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.primary,
+                        child: Text(
+                          (userProvider.user?.displayName?.substring(0, 1) ?? 'U')
+                              .toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
                     if (!isTablet) ...[
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          userProvider.user?.displayName ?? 'User',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userProvider.user?.displayName ?? 'User',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              userProvider.user?.email ?? '',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark ? Colors.grey[500] : Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
                     ],
+                    // Settings button
                     IconButton(
                       icon: Icon(
                         Icons.settings_outlined,
                         size: 20,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
                       ),
+                      tooltip: 'Settings & Privacy',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -264,6 +387,47 @@ class _MainScreenState extends State<MainScreen> {
                             builder: (context) => const SettingsScreen(),
                           ),
                         );
+                      },
+                    ),
+                    // Logout button
+                    IconButton(
+                      icon: Icon(
+                        Icons.logout_rounded,
+                        size: 20,
+                        color: Colors.red[400],
+                      ),
+                      tooltip: 'Log Out',
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Log Out'),
+                            content: const Text('Are you sure you want to log out?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                child: const Text('Log Out'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true && context.mounted) {
+                          await AuthService().signOut();
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        }
                       },
                     ),
                   ],
@@ -458,6 +622,24 @@ class _MainScreenState extends State<MainScreen> {
                 color: isDark ? Colors.grey[400] : Colors.grey[600],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 28, top: 12, bottom: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+            color: isDark ? Colors.grey[600] : Colors.grey[500],
           ),
         ),
       ),

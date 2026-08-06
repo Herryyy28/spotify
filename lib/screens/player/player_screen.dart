@@ -396,7 +396,10 @@ class _PlayerScreenState extends State<PlayerScreen>
                           _buildQueueList(playerProvider),
 
                           // Lyrics
-                          LyricsWidget(song: widget.song),
+                          LyricsWidget(
+                            song: widget.song,
+                            currentPosition: playerProvider.currentPosition,
+                          ),
 
                           // Related songs
                           _buildRelatedSongs(),
@@ -467,14 +470,22 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   Widget _buildQueueList(PlayerProvider playerProvider) {
-    return ListView.builder(
+    if (playerProvider.currentPlaylist.isEmpty) {
+      return const Center(child: Text('Queue is empty'));
+    }
+
+    return ReorderableListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: playerProvider.currentPlaylist.length,
+      onReorder: (oldIndex, newIndex) {
+        playerProvider.reorderQueue(oldIndex, newIndex);
+      },
       itemBuilder: (context, index) {
         final song = playerProvider.currentPlaylist[index];
         final isCurrent = index == playerProvider.currentIndex;
 
         return ListTile(
+          key: ValueKey('${song.id}_$index'),
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
@@ -494,8 +505,13 @@ class _PlayerScreenState extends State<PlayerScreen>
           subtitle: Text(song.artist),
           trailing: isCurrent
               ? const Icon(Icons.play_arrow, color: AppColors.primary)
-              : null,
-          onTap: () => playerProvider.playSong(song),
+              : IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: () => playerProvider.removeFromQueue(index),
+                ),
+          onTap: () async {
+            await playerProvider.seekToIndex(index);
+          },
         );
       },
     );

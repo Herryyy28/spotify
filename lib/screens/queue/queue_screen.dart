@@ -225,7 +225,7 @@ class QueueScreen extends StatelessWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (direction) {
-        playerProvider.removeFromPlaylist(index);
+        playerProvider.removeFromQueue(index);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${song.title} removed from queue'),
@@ -406,7 +406,7 @@ class QueueScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              context.read<PlayerProvider>().clearPlaylist();
+              context.read<PlayerProvider>().clearQueue();
               Navigator.pop(context);
               Navigator.pop(context);
             },
