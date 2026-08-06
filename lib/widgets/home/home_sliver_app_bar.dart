@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/colors.dart';
@@ -11,6 +12,7 @@ class HomeSliverAppBar extends StatelessWidget {
   final bool isDark;
   final TabController tabController;
   final String greeting;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
 
   const HomeSliverAppBar({
     super.key,
@@ -18,6 +20,7 @@ class HomeSliverAppBar extends StatelessWidget {
     required this.isDark,
     required this.tabController,
     required this.greeting,
+    this.scaffoldKey,
   });
 
   @override
@@ -29,6 +32,24 @@ class HomeSliverAppBar extends StatelessWidget {
       pinned: true,
       elevation: 0,
       backgroundColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+      leading: MediaQuery.of(context).size.width < 600
+          ? IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.black.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.menu_rounded, size: 22),
+              ),
+              onPressed: () {
+                scaffoldKey?.currentState?.openDrawer();
+              },
+            )
+          : null,
       actions: [
         if (isAdmin)
           Container(
@@ -234,16 +255,22 @@ class HomeSliverAppBar extends StatelessWidget {
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(48),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
+        child: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.05),
+                    ? Colors.black.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.6),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.05),
+                  ),
+                ),
               ),
-            ),
-          ),
           child: TabBar(
             controller: tabController,
             indicator: const UnderlineTabIndicator(
@@ -267,6 +294,8 @@ class HomeSliverAppBar extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      ),
       ),
     );
   }

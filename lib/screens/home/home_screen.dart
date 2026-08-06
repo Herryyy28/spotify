@@ -24,7 +24,8 @@ import '../../core/utils/logger.dart';
 import '../../appwrite_client.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  const HomeScreen({super.key, this.scaffoldKey});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -82,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen>
             isDark: isDark,
             tabController: _tabController,
             greeting: _getGreeting(),
+            scaffoldKey: widget.scaffoldKey,
           ),
 
           // ========== TAB CONTENT ==========
