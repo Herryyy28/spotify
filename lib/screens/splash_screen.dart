@@ -92,10 +92,14 @@ class _SplashScreenState extends State<SplashScreen>
                           color: AppColors.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.headphones,
-                          size: 70,
-                          color: AppColors.primary,
+                        child: ClipOval(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Image.asset(
+                              'assets/icons/app_icon.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 32),

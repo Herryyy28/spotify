@@ -69,28 +69,30 @@ class HarmonyApp extends StatelessWidget {
             routes: {
               '/splash': (context) => SplashScreen(onboardingComplete: onboardingComplete),
               '/onboarding': (context) => const OnboardingScreen(),
-              '/': (context) => Consumer<UserProvider>(
-                    builder: (context, userProvider, child) {
-                      if (!firebaseInitialized) {
-                        return const Scaffold(
-                          body: Center(
-                            child: Text(
-                              'Firebase Initialization Failed.\nCheck configuration.',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      }
-                      if (userProvider.isLoading) {
-                        return const Scaffold(
-                          body: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-                      return userProvider.isAuthenticated
-                          ? const MainScreen()
-                          : const LoginScreen();
-                    },
-                  ),
+              '/': (context) {
+                if (!firebaseInitialized) {
+                  return const Scaffold(
+                    body: Center(
+                      child: Text(
+                        'Firebase Initialization Failed.\nCheck configuration.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
+                return Consumer<UserProvider>(
+                  builder: (context, userProvider, child) {
+                    if (userProvider.isLoading) {
+                      return const Scaffold(
+                        body: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    return userProvider.isAuthenticated
+                        ? const MainScreen()
+                        : const LoginScreen();
+                  },
+                );
+              },
               '/admin': (context) => const AdminDashboardScreen(),
               '/admin/upload': (context) => const UploadSongScreen(),
               '/social/room': (context) => const ListenRoomScreen(),
