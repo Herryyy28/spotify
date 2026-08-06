@@ -19,6 +19,7 @@ import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/upload_song_screen.dart';
 import '../screens/social/listen_room_screen.dart';
+import '../screens/splash_screen.dart';
 
 class HarmonyApp extends StatelessWidget {
   final bool firebaseInitialized;
@@ -64,8 +65,9 @@ class HarmonyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeModeValue,
-            initialRoute: onboardingComplete ? '/' : '/onboarding',
+            initialRoute: '/splash',
             routes: {
+              '/splash': (context) => SplashScreen(onboardingComplete: onboardingComplete),
               '/onboarding': (context) => const OnboardingScreen(),
               '/': (context) => Consumer<UserProvider>(
                     builder: (context, userProvider, child) {

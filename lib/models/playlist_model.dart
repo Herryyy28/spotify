@@ -89,6 +89,15 @@ class Playlist {
     return '$minutes min';
   }
 
+  String get formattedFollowers {
+    if (followersCount >= 1000000) {
+      return '${(followersCount / 1000000).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')}M';
+    } else if (followersCount >= 1000) {
+      return '${(followersCount / 1000).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')}K';
+    }
+    return followersCount.toString();
+  }
+
   // Helper getter for compatibility with AI services
   String get imageUrl => coverUrl ?? '';
 

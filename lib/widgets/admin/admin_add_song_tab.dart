@@ -167,50 +167,6 @@ class AdminAddSongTab extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ── New Upload Screen CTA ──────────────────────────────────
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.pushNamed(parentContext, '/upload');
-              if (result == true) {
-                setStatus('Song uploaded and added to library!', isSuccess: true);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1DB954), Color(0xFF0DA842)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.auto_awesome, color: Colors.white, size: 28),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Try the new Smart Uploader!',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        SizedBox(height: 4),
-                        Text('Auto-detects duration and generates smart genres.',
-                            style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
 
           // Form
           Form(

@@ -8,7 +8,7 @@ class AdminDashboardTab extends StatelessWidget {
   final bool isDark;
   final Function(int) onNavigate;
   final bool isLoadingAction;
-  final Widget Function(Song, bool) buildSongTile;
+  final Widget Function(Song, bool, {bool showActions}) buildSongTile;
 
   const AdminDashboardTab({
     super.key,
@@ -177,7 +177,7 @@ class AdminDashboardTab extends StatelessWidget {
               else
                 ...musicProvider.allSongs
                     .take(5)
-                    .map((song) => buildSongTile(song, isDark)),
+                    .map((song) => buildSongTile(song, isDark, showActions: true)),
             ],
           ),
         );

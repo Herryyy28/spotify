@@ -6,6 +6,7 @@ import '../providers/user_provider.dart';
 import 'home/home_screen.dart';
 import 'home/search_screen.dart';
 import 'library/library_screen.dart';
+import 'playlist/playlist_screen.dart';
 import 'settings/settings_screen.dart';
 import 'local_files/local_files_screen.dart';
 import '../widgets/now_playing_bar.dart';
@@ -205,7 +206,12 @@ class _MainScreenState extends State<MainScreen> {
                           isDark: isDark,
                           compact: isTablet,
                           onTap: () {
-                            // TODO: Open create playlist dialog
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PlaylistScreen(),
+                              ),
+                            );
                           },
                         ),
                         _buildActionItem(
@@ -215,7 +221,7 @@ class _MainScreenState extends State<MainScreen> {
                           compact: isTablet,
                           iconColor: AppColors.neonPink,
                           onTap: () {
-                            // TODO: Navigate to liked songs
+                            setState(() => _selectedIndex = 2);
                           },
                         ),
                         _buildActionItem(
@@ -558,54 +564,81 @@ class _MainScreenState extends State<MainScreen> {
     bool compact = false,
   }) {
     final isSelected = _selectedIndex == index;
+    bool isHovered = false;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => setState(() => _selectedIndex = index),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 12 : 16,
-              vertical: 12,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
+      child: StatefulBuilder(
+        builder: (context, setHoverState) {
+          return MouseRegion(
+            onEnter: (_) => setHoverState(() => isHovered = true),
+            onExit: (_) => setHoverState(() => isHovered = false),
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedIndex = index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary
-                      : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                  size: 24,
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : (isHovered
+                          ? (isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.04))
+                          : Colors.transparent),
+                  borderRadius: BorderRadius.circular(12),
+                  border: isHovered && !isSelected
+                      ? Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.05),
+                        )
+                      : Border.all(color: Colors.transparent),
                 ),
-                if (!compact) ...[
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected
-                            ? AppColors.primary
-                            : (isDark ? Colors.grey[300] : Colors.grey[700]),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: isHovered
+                        ? ImageFilter.blur(sigmaX: 8, sigmaY: 8)
+                        : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: compact ? 12 : 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            icon,
+                            color: isSelected
+                                ? AppColors.primary
+                                : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            size: 24,
+                          ),
+                          if (!compact) ...[
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight:
+                                      isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : (isDark ? Colors.grey[300] : Colors.grey[700]),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -618,43 +651,75 @@ class _MainScreenState extends State<MainScreen> {
     Color? iconColor,
     required VoidCallback onTap,
   }) {
+    bool isHovered = false;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 12 : 16,
-              vertical: 12,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: iconColor ??
-                      (isDark ? Colors.grey[400] : Colors.grey[600]),
-                  size: 24,
+      child: StatefulBuilder(
+        builder: (context, setHoverState) {
+          return MouseRegion(
+            onEnter: (_) => setHoverState(() => isHovered = true),
+            onExit: (_) => setHoverState(() => isHovered = false),
+            child: GestureDetector(
+              onTap: onTap,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: isHovered
+                      ? (isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.04))
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: isHovered
+                      ? Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.05),
+                        )
+                      : Border.all(color: Colors.transparent),
                 ),
-                if (!compact) ...[
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.grey[300] : Colors.grey[700],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: isHovered
+                        ? ImageFilter.blur(sigmaX: 8, sigmaY: 8)
+                        : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: compact ? 12 : 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            icon,
+                            color: iconColor ??
+                                (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            size: 24,
+                          ),
+                          if (!compact) ...[
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? Colors.grey[300] : Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

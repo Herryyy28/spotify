@@ -271,7 +271,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                   ),
                   _buildStatItem(
                     Icons.person,
-                    '${playlist.followersCount}',
+                    playlist.formattedFollowers,
                     'Followers',
                   ),
                 ],

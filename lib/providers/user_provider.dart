@@ -10,7 +10,6 @@ import '../data/repositories/user_repository.dart';
 import '../data/repositories/firestore_user_repository.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
-
 import 'package:flutter/foundation.dart' show kDebugMode;
 
 class UserProvider extends ChangeNotifier {
@@ -49,7 +48,9 @@ class UserProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isEmailVerified => _user?.emailVerified ?? false;
   bool get isPremium => _profile['premium'] ?? false;
-  bool get isAdmin => _profile['isAdmin'] == true;
+  bool get isAdmin =>
+      _user?.email == 'prajapatiherry.28@gmail.com' ||
+      _profile['isAdmin'] == true;
   bool get isAnonymous => _user?.isAnonymous ?? false;
   // Constructor handled above
 
@@ -169,8 +170,9 @@ class UserProvider extends ChangeNotifier {
         if (profileData != null) {
           _profile = profileData;
         }
-        await loadLikedSongs();
-        await loadRecentlyPlayed();
+        // Load songs in the background without blocking the login flow
+        loadLikedSongs();
+        loadRecentlyPlayed();
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading user profile: $e');
@@ -185,7 +187,7 @@ class UserProvider extends ChangeNotifier {
         // Optimistic update
         _profile.addAll(data);
         notifyListeners();
-        
+
         await _userRepository.updateUserProfile(_user!.uid, data);
         return true;
       }
@@ -295,25 +297,30 @@ class UserProvider extends ChangeNotifier {
         final likedIds = await _userRepository.getLikedSongIds(_user!.uid);
 
         final List<Song> freshLikedSongs = [];
-        for (final id in likedIds) {
-          try {
-            final song = await _songRepository.getSongById(id);
-            freshLikedSongs.add(song);
-          } catch (e) {
-            AppLogger.warning('Could not load liked song $id: $e');
-          }
+        for (int i = 0; i < likedIds.length; i += 5) {
+          final chunk = likedIds.skip(i).take(5);
+          final futures = chunk.map((id) async {
+            try {
+              return await _songRepository.getSongById(id);
+            } catch (e) {
+              return null;
+            }
+          });
+          final chunkSongs = await Future.wait(futures);
+          freshLikedSongs.addAll(chunkSongs.whereType<Song>());
         }
-        
+
         _likedSongs = freshLikedSongs;
-        
+
         // Update cache silently
         try {
-          final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+          final encodedList =
+              jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
           box.put('liked_songs_${_user!.uid}', encodedList);
         } catch (e) {
           AppLogger.error('Cache write error: $e');
         }
-        
+
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading liked songs: $e');
@@ -330,7 +337,8 @@ class UserProvider extends ChangeNotifier {
         _likedSongs.add(song);
         try {
           final box = Hive.box('user_cache');
-          final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+          final encodedList =
+              jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
           box.put('liked_songs_${_user!.uid}', encodedList);
         } catch (_) {}
       }
@@ -350,7 +358,8 @@ class UserProvider extends ChangeNotifier {
       _likedSongs.removeWhere((s) => s.id == songId);
       try {
         final box = Hive.box('user_cache');
-        final encodedList = jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
+        final encodedList =
+            jsonEncode(_likedSongs.map((s) => s.toJson()).toList());
         box.put('liked_songs_${_user!.uid}', encodedList);
       } catch (_) {}
       notifyListeners();
@@ -384,28 +393,37 @@ class UserProvider extends ChangeNotifier {
         }
 
         final history = await _userRepository.getRecentlyPlayed(_user!.uid);
+        final historyList = history.toList();
         final List<Song> freshRecentlyPlayed = [];
-        for (final item in history) {
-          try {
-            final song = await _songRepository.getSongById(item['songId']);
-            if (!freshRecentlyPlayed.any((s) => s.id == song.id)) {
+        for (int i = 0; i < historyList.length; i += 5) {
+          final chunk = historyList.skip(i).take(5);
+          final futures = chunk.map((item) async {
+            try {
+              return await _songRepository.getSongById(item['songId']);
+            } catch (e) {
+              return null;
+            }
+          });
+          final chunkSongs = await Future.wait(futures);
+          for (final song in chunkSongs) {
+            if (song != null &&
+                !freshRecentlyPlayed.any((s) => s.id == song.id)) {
               freshRecentlyPlayed.add(song);
             }
-          } catch (e) {
-            AppLogger.warning('Could not load recent song: $e');
           }
         }
-        
+
         _recentlyPlayed = freshRecentlyPlayed;
-        
+
         // Update cache silently
         try {
-          final encodedList = jsonEncode(_recentlyPlayed.map((s) => s.toJson()).toList());
+          final encodedList =
+              jsonEncode(_recentlyPlayed.map((s) => s.toJson()).toList());
           box.put('recent_songs_${_user!.uid}', encodedList);
         } catch (e) {
           AppLogger.error('Cache write error: $e');
         }
-        
+
         notifyListeners();
       } catch (e) {
         AppLogger.error('Error loading recently played: $e');

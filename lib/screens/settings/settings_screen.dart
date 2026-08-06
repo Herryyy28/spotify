@@ -107,9 +107,9 @@ class SettingsScreen extends StatelessWidget {
                             : null,
                         child: userProvider.user?.photoURL == null
                             ? Text(
-                                (userProvider.user?.displayName
-                                            ?.substring(0, 1) ??
-                                        'U')
+                                ((userProvider.user?.displayName != null && userProvider.user!.displayName!.isNotEmpty)
+                                        ? userProvider.user!.displayName!.substring(0, 1)
+                                        : 'U')
                                     .toUpperCase(),
                                 style: const TextStyle(
                                   fontSize: 32,
@@ -120,13 +120,36 @@ class SettingsScreen extends StatelessWidget {
                             : null,
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        userProvider.user?.displayName ?? 'User',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            userProvider.user?.displayName ?? 'User',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          if (userProvider.profile['pronouns'] != null && userProvider.profile['pronouns'].toString().isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                userProvider.profile['pronouns'],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.grey[300] : Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -136,7 +159,39 @@ class SettingsScreen extends StatelessWidget {
                           color: isDark ? Colors.grey[400] : Colors.grey[600],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      if (userProvider.profile['location'] != null && userProvider.profile['location'].toString().isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.location_on, size: 14, color: AppColors.primary),
+                            const SizedBox(width: 4),
+                            Text(
+                              userProvider.profile['location'],
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      if (userProvider.profile['bio'] != null && userProvider.profile['bio'].toString().isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            userProvider.profile['bio'],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                              color: isDark ? Colors.grey[300] : Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -194,22 +249,6 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
 
-                // Open Admin Dashboard tile for Admins only
-                if (userProvider.isAdmin)
-                  _buildSettingsTile(
-                    icon: Icons.admin_panel_settings,
-                    title: 'Open Admin Dashboard',
-                    isDark: isDark,
-                    textColor: AppColors.primary,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminDashboardScreen(),
-                        ),
-                      );
-                    },
-                  ),
 
                 // Theme Toggle
                 _buildThemeTile(
@@ -672,65 +711,195 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _showEditProfileDialog(
       BuildContext context, UserProvider userProvider) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final nameController =
-        TextEditingController(text: userProvider.user?.displayName);
+    
+    final profile = userProvider.profile;
+    
+    final nameController = TextEditingController(text: userProvider.user?.displayName);
+    final bioController = TextEditingController(text: profile['bio'] ?? '');
+    final pronounsController = TextEditingController(text: profile['pronouns'] ?? '');
+    final locationController = TextEditingController(text: profile['location'] ?? '');
+    final socialController = TextEditingController(text: profile['social'] ?? '');
 
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.cardDark : Colors.white,
-        title: Text(
-          'Edit Profile',
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-          ),
-        ),
-        content: TextField(
-          controller: nameController,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-          ),
+    Widget buildField(String label, TextEditingController controller, IconData icon, {int maxLines = 1, String? hint}) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 15),
           decoration: InputDecoration(
-            labelText: 'Display Name',
-            labelStyle: TextStyle(
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
+            labelText: label,
+            hintText: hint,
+            prefixIcon: Icon(icon, color: AppColors.primary.withValues(alpha: 0.7)),
+            filled: true,
+            fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.02),
+            hintStyle: TextStyle(color: isDark ? Colors.grey[600] : Colors.grey[400]),
+            labelStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-              ),
+              borderSide: const BorderSide(color: Colors.transparent),
+              borderRadius: BorderRadius.circular(16),
             ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.primary),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+      );
+    }
+
+    await showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Edit Profile',
+      barrierColor: Colors.black.withValues(alpha: 0.6),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: 450,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
+              margin: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.cardDark : Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 30,
+                    offset: const Offset(0, 15),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Edit Profile',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          buildField('Display Name', nameController, Icons.person),
+                          buildField('Pronouns', pronounsController, Icons.badge, hint: 'e.g. they/them'),
+                          buildField('Bio', bioController, Icons.info_outline, maxLines: 3, hint: 'Tell us about yourself...'),
+                          buildField('Location', locationController, Icons.location_on, hint: 'e.g. New York, USA'),
+                          buildField('Social Link', socialController, Icons.link, hint: 'https://twitter.com/...'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final newName = nameController.text.trim();
+                              Map<String, dynamic> updates = {
+                                'bio': bioController.text.trim(),
+                                'pronouns': pronounsController.text.trim(),
+                                'location': locationController.text.trim(),
+                                'social': socialController.text.trim(),
+                              };
+                              if (newName.isNotEmpty && newName != userProvider.user?.displayName) {
+                                await userProvider.updateDisplayName(newName);
+                                updates['name'] = newName;
+                              }
+                              await userProvider.updateProfile(updates);
+                              if (context.mounted) Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            child: const Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final newName = nameController.text.trim();
-              if (newName.isNotEmpty) {
-                await userProvider.updateDisplayName(newName);
-                await userProvider.updateProfile({'name': newName});
-              }
-              if (context.mounted) Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-            ),
-            child: const Text('Save'),
+        );
+      },
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return Transform.scale(
+          scale: Curves.easeOutQuint.transform(0.8 + (anim.value * 0.2)),
+          child: Opacity(
+            opacity: anim.value,
+            child: child,
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

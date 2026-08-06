@@ -21,7 +21,6 @@ import '../../widgets/home/quick_picks_section.dart';
 import '../../widgets/home/recently_played_section.dart';
 import '../../widgets/home/recommended_playlists_section.dart';
 import '../../core/utils/logger.dart';
-import '../../appwrite_client.dart';
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -123,17 +122,6 @@ class _HomeScreenState extends State<HomeScreen>
       padding: const EdgeInsets.symmetric(vertical: 20),
       physics: const BouncingScrollPhysics(),
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: ElevatedButton(
-            onPressed: () => client.ping(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Send a ping'),
-          ),
-        ),
         // Quick Search Bar
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
