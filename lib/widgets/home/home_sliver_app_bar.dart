@@ -194,10 +194,10 @@ class HomeSliverAppBar extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 8),
-                        Consumer<HomeProvider>(
-                          builder: (context, homeProvider, _) {
+                        Consumer<MusicProvider>(
+                          builder: (context, musicProvider, _) {
                             return Text(
-                              '${homeProvider.totalSongs} songs • ${homeProvider.totalPlaylists} playlists',
+                              '${musicProvider.totalSongs} songs • ${musicProvider.totalPlaylists} playlists',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,

@@ -20,7 +20,7 @@ class EqualizerWidget extends StatefulWidget {
   });
 
   @override
-  _EqualizerWidgetState createState() => _EqualizerWidgetState();
+  State<EqualizerWidget> createState() => _EqualizerWidgetState();
 }
 
 class _EqualizerWidgetState extends State<EqualizerWidget>
@@ -166,7 +166,7 @@ class SpectrumVisualizer extends StatefulWidget {
   });
 
   @override
-  _SpectrumVisualizerState createState() => _SpectrumVisualizerState();
+  State<SpectrumVisualizer> createState() => _SpectrumVisualizerState();
 }
 
 class _SpectrumVisualizerState extends State<SpectrumVisualizer>

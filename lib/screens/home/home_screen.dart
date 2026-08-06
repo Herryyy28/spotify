@@ -12,7 +12,6 @@ import '../../providers/user_provider.dart';
 import '../../core/theme/colors.dart';
 import '../player/player_screen.dart';
 import 'search_screen.dart';
-import '../../services/firebase_service.dart';
 import '../../widgets/song_tile.dart';
 import '../../widgets/playlist_card.dart';
 import '../../widgets/home/home_sliver_app_bar.dart';
@@ -27,7 +26,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.scaffoldKey});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen>
@@ -44,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Load data for all tabs
-      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-      homeProvider.loadInitialData();
+      final musicProvider = Provider.of<MusicProvider>(context, listen: false);
+      musicProvider.loadInitialData();
     });
   }
 
@@ -244,10 +243,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildNewHitsTab() {
-    return Consumer<HomeProvider>(
-      builder: (context, homeProvider, _) {
-        final newHits = homeProvider.featuredSongs;
-        if (homeProvider.isLoading && newHits.isEmpty) {
+    return Consumer<MusicProvider>(
+      builder: (context, musicProvider, _) {
+        final newHits = musicProvider.featuredSongs;
+        if (musicProvider.isLoading && newHits.isEmpty) {
           return _buildLoadingShimmer();
         }
         if (newHits.isEmpty) {
@@ -283,10 +282,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildChartsTab() {
-    return Consumer<HomeProvider>(
-      builder: (context, homeProvider, _) {
-        final charts = homeProvider.charts;
-        if (homeProvider.isLoading && charts.isEmpty) {
+    return Consumer<MusicProvider>(
+      builder: (context, musicProvider, _) {
+        final charts = musicProvider.charts;
+        if (musicProvider.isLoading && charts.isEmpty) {
           return _buildLoadingShimmer();
         }
         if (charts.isEmpty) {
@@ -583,42 +582,6 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildLoadingShimmer() {
     return const Center(
       child: CircularProgressIndicator(color: AppColors.primary),
-    );
-  }
-
-  Widget _buildListShimmer({int count = 5, bool horizontal = false}) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: SizedBox(
-        height: horizontal ? 140 : null,
-        child: horizontal
-            ? ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: count,
-                itemBuilder: (_, __) => Container(
-                  width: 120,
-                  margin: const EdgeInsets.only(right: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              )
-            : Column(
-                children: List.generate(
-                  count,
-                  (index) => Container(
-                    height: 72,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-      ),
     );
   }
 }

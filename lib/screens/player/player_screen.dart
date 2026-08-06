@@ -15,7 +15,7 @@ class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key, required this.song, this.playlist});
 
   @override
-  _PlayerScreenState createState() => _PlayerScreenState();
+  State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
 class _PlayerScreenState extends State<PlayerScreen>
@@ -478,6 +478,9 @@ class _PlayerScreenState extends State<PlayerScreen>
       padding: const EdgeInsets.all(16),
       itemCount: playerProvider.currentPlaylist.length,
       onReorder: (oldIndex, newIndex) {
+        if (oldIndex < newIndex) {
+          newIndex -= 1;
+        }
         playerProvider.reorderQueue(oldIndex, newIndex);
       },
       itemBuilder: (context, index) {

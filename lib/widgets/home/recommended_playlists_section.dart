@@ -32,10 +32,10 @@ class RecommendedPlaylistsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Consumer<HomeProvider>(
-          builder: (context, homeProvider, _) {
-            final playlists = homeProvider.featuredPlaylists;
-            if (homeProvider.isLoading && playlists.isEmpty) {
+        Consumer<MusicProvider>(
+          builder: (context, musicProvider, _) {
+            final playlists = musicProvider.featuredPlaylists;
+            if (musicProvider.isLoading && playlists.isEmpty) {
               return _buildShimmer();
             }
             if (playlists.isEmpty) {

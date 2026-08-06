@@ -20,7 +20,7 @@ class AdminDashboardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeProvider>(
+    return Consumer<MusicProvider>(
       builder: (context, musicProvider, _) {
         final totalSongs = musicProvider.allSongs.length;
         return SingleChildScrollView(

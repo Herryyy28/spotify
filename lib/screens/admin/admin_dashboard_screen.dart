@@ -1,21 +1,17 @@
 import 'dart:io';
 import 'dart:ui';
-import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/colors.dart';
 import '../../models/song_model.dart';
-import '../../models/playlist_model.dart';
 import '../../providers/music_provider.dart';
-import '../../providers/playlist_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../data/repositories/firestore_song_repository.dart';
 import '../../data/repositories/song_repository.dart';
 import '../../services/firebase_service.dart'; // kept for storage uploads only
 import '../../core/utils/logger.dart';
-import '../playlist/playlist_detail_screen.dart';
 import '../../widgets/admin/admin_dashboard_tab.dart';
 import '../../widgets/admin/admin_playlists_tab.dart';
 import '../../widgets/admin/admin_library_tab.dart';
@@ -694,6 +690,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           // Native mobile/desktop fallback
           bytes = await File(file.path!).readAsBytes();
         }
+        if (!mounted) return;
         if (bytes != null) {
           setState(() {
             _audioBytes = bytes;
@@ -722,6 +719,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           // Native mobile/desktop fallback
           bytes = await File(file.path!).readAsBytes();
         }
+        if (!mounted) return;
         if (bytes != null) {
           setState(() {
             _coverBytes = bytes;
@@ -823,6 +821,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         } catch (uploadErr) {
           AppLogger.error('Storage upload notice: $uploadErr');
         }
+        if (!mounted) return;
         setState(() => _uploadProgress = 0.9);
       }
 
@@ -857,40 +856,46 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         releaseDate: DateTime.now(),
       );
 
+      if (!mounted) return;
       setState(() => _uploadProgress = 0.95);
-      final musicProvider = Provider.of<HomeProvider>(context, listen: false);
+      final musicProvider = Provider.of<MusicProvider>(context, listen: false);
 
       if (_editingSongId != null) {
         try {
           await _songRepository.updateSong(song).timeout(const Duration(seconds: 30));
+          if (!mounted) return;
           // Update local state only after confirmed Firebase write
           musicProvider.updateSong(song);
           _setStatus('✅ Song "${song.title}" updated successfully! Live in your app.');
         } catch (e) {
           AppLogger.error('Song update error: $e');
-          _setStatus('Failed to update song: $e', isSuccess: false);
+          if (mounted) _setStatus('Failed to update song: $e', isSuccess: false);
         }
       } else {
         try {
           await _songRepository.addSong(song).timeout(const Duration(seconds: 30));
+          if (!mounted) return;
           // Update local state only after confirmed Firebase write
           musicProvider.addSong(song);
           _setStatus('🎉 "${song.title}" published! Instantly live on player and home screen.');
         } catch (e) {
           AppLogger.error('Song add error: $e');
-          _setStatus('Failed to publish song: $e', isSuccess: false);
+          if (mounted) _setStatus('Failed to publish song: $e', isSuccess: false);
         }
       }
-
-      setState(() => _uploadProgress = 1.0);
-      _clearForm();
+      if (mounted) {
+        setState(() => _uploadProgress = 1.0);
+        _clearForm();
+      }
     } catch (e) {
-      _setStatus('Error saving song: $e', isSuccess: false);
+      if (mounted) _setStatus('Error saving song: $e', isSuccess: false);
     } finally {
-      setState(() {
-        _isLoadingAction = false;
-        _uploadProgress = 0;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingAction = false;
+          _uploadProgress = 0;
+        });
+      }
     }
   }
 
@@ -945,14 +950,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
     if (confirmed == true) {
       try {
+        if (!mounted) return;
         final musicProvider =
-            Provider.of<HomeProvider>(context, listen: false);
+            Provider.of<MusicProvider>(context, listen: false);
         await _songRepository.deleteSong(song.id);
+        if (!mounted) return;
         musicProvider.deleteSong(song.id);
         _setStatus(
             '🗑️ "${song.title}" deleted from Firebase and all user devices.');
       } catch (e) {
-        _setStatus('Error deleting: $e', isSuccess: false);
+        if (mounted) _setStatus('Error deleting: $e', isSuccess: false);
       }
     }
   }

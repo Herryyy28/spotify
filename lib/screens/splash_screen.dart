@@ -64,75 +64,48 @@ class _SplashScreenState extends State<SplashScreen>
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode(context);
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [AppColors.backgroundDark, AppColors.surfaceDark]
-                : [AppColors.backgroundLight, AppColors.surfaceLight],
-          ),
-        ),
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _fadeAnimation.value,
-                child: Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Image.asset(
-                              'assets/icons/app_icon.png',
-                              fit: BoxFit.contain,
-                            ),
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _fadeAnimation.value,
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 32),
+                    Text(
+                      AppStrings.appName,
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            foreground: Paint()
+                              ..shader = const LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondary,
+                                ],
+                              ).createShader(
+                                const Rect.fromLTWH(0, 0, 200, 70),
+                              ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      Text(
-                        AppStrings.appName,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              foreground: Paint()
-                                ..shader = const LinearGradient(
-                                  colors: [
-                                    AppColors.primary,
-                                    AppColors.secondary,
-                                  ],
-                                ).createShader(
-                                  const Rect.fromLTWH(0, 0, 200, 70),
-                                ),
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Listen to millions of songs',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
-                              letterSpacing: 1.2,
-                            ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Listen to millions of songs',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            letterSpacing: 1.2,
+                          ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

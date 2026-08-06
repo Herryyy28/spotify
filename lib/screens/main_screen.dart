@@ -11,7 +11,6 @@ import 'settings/settings_screen.dart';
 import 'local_files/local_files_screen.dart';
 import '../widgets/now_playing_bar.dart';
 import 'admin/admin_dashboard_screen.dart';
-import '../core/responsive/breakpoints.dart';
 import '../core/responsive/responsive_layout.dart';
 import 'podcast/podcast_browse_screen.dart';
 import 'social/listen_room_screen.dart';
@@ -34,9 +33,8 @@ class _MainScreenState extends State<MainScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
+    Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = ResponsiveLayout.isMobile(context);
     final isTablet = ResponsiveLayout.isTablet(context);
     final userProvider = Provider.of<UserProvider>(context);

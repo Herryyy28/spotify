@@ -11,7 +11,7 @@ class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
 
   @override
-  _LibraryScreenState createState() => _LibraryScreenState();
+  State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
 class _LibraryScreenState extends State<LibraryScreen>
@@ -154,9 +154,8 @@ class _LibraryScreenState extends State<LibraryScreen>
                     ElevatedButton(
                       onPressed: () async {
                         await userProvider.signOut();
-                        if (context.mounted) {
-                          Navigator.of(context).pushReplacementNamed('/login');
-                        }
+                        if (!context.mounted) return;
+                        Navigator.of(context).pushReplacementNamed('/login');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

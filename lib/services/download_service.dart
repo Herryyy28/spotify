@@ -20,13 +20,6 @@ class DownloadService {
       {};
 
   final Box _downloadBox = Hive.box('downloads');
-  final CacheManager _cacheManager = CacheManager(
-    Config(
-      'download_cache',
-      stalePeriod: const Duration(days: 30),
-      maxNrOfCacheObjects: 200,
-    ),
-  );
 
   // Stream for download progress
   Stream<DownloadProgress> getDownloadProgress(String downloadId) {

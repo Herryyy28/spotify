@@ -6,7 +6,6 @@ import 'firebase_service.dart';
 
 class RecommendationService {
   final FirebaseService _firebaseService = FirebaseService();
-  final _random = Random();
 
   // Get personalized recommendations
   Future<List<Song>> getPersonalizedRecommendations(String userId) async {
@@ -160,8 +159,6 @@ class RecommendationService {
   // Get trending songs
   Future<List<Song>> getTrendingSongs() async {
     try {
-      final lastWeek = DateTime.now().subtract(const Duration(days: 7));
-
       // Get songs with most plays in last week
       final snapshot = await FirebaseFirestore.instance
           .collection('songs')

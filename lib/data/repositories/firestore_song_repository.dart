@@ -88,7 +88,7 @@ class FirestoreSongRepository implements SongRepository {
       final snapshot = await _db
           .collection(_collection)
           .where('title', isGreaterThanOrEqualTo: query)
-          .where('title', isLessThan: '${query}\uf8ff')
+          .where('title', isLessThan: '$query\uf8ff')
           .limit(limit)
           .get();
       return _mapDocs(snapshot.docs);

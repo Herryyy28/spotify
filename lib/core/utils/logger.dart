@@ -102,6 +102,7 @@ class AppLogger {
   static void exportLogs() {
     // Export logs to file
     final logs = _logs.join('\n');
+    debugPrint('Exporting logs: ${logs.length} characters');
     // Save to file implementation
   }
 }

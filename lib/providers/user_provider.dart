@@ -10,7 +10,6 @@ import '../data/repositories/user_repository.dart';
 import '../data/repositories/firestore_user_repository.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 
 class UserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();

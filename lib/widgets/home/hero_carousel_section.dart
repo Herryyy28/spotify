@@ -38,10 +38,10 @@ class HeroCarouselSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Consumer<HomeProvider>(
-          builder: (context, homeProvider, _) {
-            final featured = homeProvider.featuredPlaylists;
-            if (homeProvider.isLoading && featured.isEmpty) {
+        Consumer<MusicProvider>(
+          builder: (context, musicProvider, _) {
+            final featured = musicProvider.featuredPlaylists;
+            if (musicProvider.isLoading && featured.isEmpty) {
               return _buildCarouselShimmer();
             }
             if (featured.isEmpty) {

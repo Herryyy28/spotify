@@ -130,10 +130,10 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final playlistProvider = Provider.of<PlaylistProvider>(context);
-    final homeProvider = Provider.of<HomeProvider>(context);
+    final musicProvider = Provider.of<MusicProvider>(context);
 
     final userPlaylists = playlistProvider.playlists;
-    final featuredPlaylists = homeProvider.featuredPlaylists;
+    final featuredPlaylists = musicProvider.featuredPlaylists;
 
     return Scaffold(
       backgroundColor:

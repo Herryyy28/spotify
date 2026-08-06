@@ -41,21 +41,20 @@ class HarmonyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PodcastProvider()),
         ChangeNotifierProvider(create: (_) => ListeningRoomProvider()),
         ChangeNotifierProvider(create: (_) => SongUploadProvider()),
-        if (firebaseInitialized) ...[
-          // Wire UserProvider after PlayerProvider so auth state forwards userId
-          ChangeNotifierProxyProvider<PlayerProvider, UserProvider>(
-            create: (_) => UserProvider(),
-            update: (_, player, user) {
-              user!.attachPlayerProvider(player);
-              return user;
-            },
-          ),
-          ChangeNotifierProvider(create: (_) => HomeProvider()),
-          ChangeNotifierProvider(create: (_) => SearchProvider()),
-          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
-          ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
-          ChangeNotifierProvider(create: (_) => SocialProvider()),
-        ],
+        // UserProvider should be available even if Firebase fails to init, 
+        // as many UI components (MainScreen, Sidebar) depend on it.
+        ChangeNotifierProxyProvider<PlayerProvider, UserProvider>(
+          create: (_) => UserProvider(),
+          update: (_, player, user) {
+            user!.attachPlayerProvider(player);
+            return user;
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => MusicProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
+        ChangeNotifierProvider(create: (_) => SocialProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -70,16 +69,6 @@ class HarmonyApp extends StatelessWidget {
               '/splash': (context) => SplashScreen(onboardingComplete: onboardingComplete),
               '/onboarding': (context) => const OnboardingScreen(),
               '/': (context) {
-                if (!firebaseInitialized) {
-                  return const Scaffold(
-                    body: Center(
-                      child: Text(
-                        'Firebase Initialization Failed.\nCheck configuration.',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
-                }
                 return Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     if (userProvider.isLoading) {

@@ -9,7 +9,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/song_model.dart';
 import '../data/repositories/firestore_song_repository.dart';
 import '../data/repositories/firestore_user_repository.dart';
-import '../services/firebase_service.dart';
 
 class AudioService {
   static final AudioService _instance = AudioService._internal();

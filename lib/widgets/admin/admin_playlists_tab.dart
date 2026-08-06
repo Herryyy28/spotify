@@ -81,7 +81,7 @@ class _AdminPlaylistsTabState extends State<AdminPlaylistsTab> {
   }
 
   void _showManagePlaylistSongsModal(BuildContext context, Playlist playlist) {
-    final musicProvider = Provider.of<HomeProvider>(context, listen: false);
+    final musicProvider = Provider.of<MusicProvider>(context, listen: false);
     final playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
     final allSongs = musicProvider.allSongs;
 
@@ -165,7 +165,7 @@ class _AdminPlaylistsTabState extends State<AdminPlaylistsTab> {
   @override
   Widget build(BuildContext context) {
     final playlistProvider = Provider.of<PlaylistProvider>(context);
-    final musicProvider = Provider.of<HomeProvider>(context);
+    final musicProvider = Provider.of<MusicProvider>(context);
     final playlists = [...playlistProvider.playlists, ...musicProvider.featuredPlaylists];
 
     return SingleChildScrollView(

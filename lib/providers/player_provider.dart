@@ -5,7 +5,6 @@ import 'package:just_audio/just_audio.dart';
 import '../models/song_model.dart';
 import '../services/audio_service.dart';
 import '../data/repositories/firestore_user_repository.dart';
-import '../services/firebase_service.dart';
 
 class PlayerProvider extends ChangeNotifier {
   final AudioService _audioService = AudioService();
@@ -86,9 +85,11 @@ class PlayerProvider extends ChangeNotifier {
       if (_trackedSong?.id != info.currentSong?.id) {
         _flushListeningHistory();
         _trackedSong = info.currentSong;
-        if (info.isPlaying) _listenStopwatch
-          ..reset()
-          ..start();
+        if (info.isPlaying) {
+          _listenStopwatch
+            ..reset()
+            ..start();
+        }
       }
 
       // Manage stopwatch based on play/pause state
@@ -289,7 +290,6 @@ class PlayerProvider extends ChangeNotifier {
 
   void setSleepTimerAfterSong() {
     cancelSleepTimer();
-    _stopAfterSong = true;
     _sleepTimerRemaining = null;
     notifyListeners();
     AppLogger.info('Sleep timer: stop after current song');
@@ -299,7 +299,6 @@ class PlayerProvider extends ChangeNotifier {
     _sleepTimer?.cancel();
     _sleepTimerCountdown?.cancel();
     _sleepTimerRemaining = null;
-    _stopAfterSong = false;
     notifyListeners();
   }
 

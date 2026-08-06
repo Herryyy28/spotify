@@ -15,7 +15,7 @@ class LyricsWidget extends StatefulWidget {
   });
 
   @override
-  _LyricsWidgetState createState() => _LyricsWidgetState();
+  State<LyricsWidget> createState() => _LyricsWidgetState();
 }
 
 class _LyricsWidgetState extends State<LyricsWidget> {
@@ -207,7 +207,7 @@ class _LyricsWidgetState extends State<LyricsWidget> {
             fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
             color: isCurrent
                 ? AppColors.primary
-                : theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
+                : theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.5),
             height: 1.8,
           ),
           child: Container(

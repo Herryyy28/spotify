@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../providers/player_provider.dart';
-import '../../services/firebase_service.dart';
 import '../../models/song_model.dart';
 import '../../models/artist_model.dart';
 import '../../models/playlist_model.dart';
@@ -16,7 +15,7 @@ class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {

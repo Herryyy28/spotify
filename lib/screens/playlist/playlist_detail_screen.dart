@@ -18,7 +18,7 @@ class PlaylistDetailScreen extends StatefulWidget {
   });
 
   @override
-  _PlaylistDetailScreenState createState() => _PlaylistDetailScreenState();
+  State<PlaylistDetailScreen> createState() => _PlaylistDetailScreenState();
 }
 
 class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {

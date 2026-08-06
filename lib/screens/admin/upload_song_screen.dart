@@ -1,12 +1,10 @@
-import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/colors.dart';
 import '../../models/song_model.dart';
-import '../../providers/music_provider.dart';
 import '../../providers/song_upload_provider.dart';
 import '../../providers/user_provider.dart';
 
@@ -146,7 +144,6 @@ class _UploadSongScreenState extends State<UploadSongScreen>
 
     final userProvider = context.read<UserProvider>();
     final uploadProvider = context.read<SongUploadProvider>();
-    final homeProvider = context.read<HomeProvider>();
 
     if (!userProvider.isAdmin) {
       _showSnack('Admin access required.', isError: true);
@@ -657,6 +654,7 @@ class _UploadSongScreenState extends State<UploadSongScreen>
     required String hint,
     required IconData icon,
     required bool isDark,
+    String? initialValue,
     String? Function(String?)? validator,
     void Function(String)? onChanged,
   }) {
@@ -664,6 +662,7 @@ class _UploadSongScreenState extends State<UploadSongScreen>
       controller: controller,
       validator: validator,
       onChanged: onChanged,
+      initialValue: initialValue,
       style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         hintText: hint,

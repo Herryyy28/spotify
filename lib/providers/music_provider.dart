@@ -6,10 +6,10 @@ import '../models/playlist_model.dart';
 import '../data/repositories/song_repository.dart';
 import '../data/repositories/firestore_song_repository.dart';
 
-class HomeProvider extends ChangeNotifier {
+class MusicProvider extends ChangeNotifier {
   final SongRepository _songRepository;
 
-  HomeProvider({SongRepository? songRepository})
+  MusicProvider({SongRepository? songRepository})
       : _songRepository = songRepository ?? FirestoreSongRepository();
 
   List<Song> _featuredSongs = [];

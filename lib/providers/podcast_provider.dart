@@ -11,7 +11,7 @@ class PodcastProvider extends ChangeNotifier {
   Map<String, int> _episodeProgress = {}; // episodeId -> seconds listened
   List<String> _bookmarkedEpisodes = [];
   List<String> _subscribedPodcasts = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   List<Podcast> get podcasts => _podcasts;
   Podcast? get selectedPodcast => _selectedPodcast;

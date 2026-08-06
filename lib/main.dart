@@ -4,33 +4,13 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
-import 'providers/theme_provider.dart' hide AppTheme;
-import 'providers/player_provider.dart';
-import 'providers/playlist_provider.dart';
-import 'providers/user_provider.dart';
-import 'providers/music_provider.dart';
-import 'providers/search_provider.dart';
-import 'providers/recommendation_provider.dart';
-import 'providers/analytics_provider.dart';
-import 'providers/social_provider.dart';
-import 'providers/podcast_provider.dart';
-import 'providers/listening_room_provider.dart';
-import 'providers/song_upload_provider.dart';
 import 'app/app.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/main_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/admin/admin_dashboard_screen.dart';
-import 'screens/admin/upload_song_screen.dart';
-import 'screens/social/listen_room_screen.dart';
 
 bool _firebaseInitialized = false;
 
